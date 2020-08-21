@@ -10,7 +10,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name="com.stackbuffers.groceryclient.activities.CouponsActivity"/>
+        <activity android:name="com.stackbuffers.groceryclient.activities.CouponsActivity" />
         <activity android:name="com.stackbuffers.groceryclient.activities.ContactUsActivity" />
         <activity android:name="com.stackbuffers.groceryclient.activities.PointsActivity" />
         <activity android:name="com.stackbuffers.groceryclient.activities.HelpActivity" />

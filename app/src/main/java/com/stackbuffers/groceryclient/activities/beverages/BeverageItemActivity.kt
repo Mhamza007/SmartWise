@@ -17,7 +17,7 @@ import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
 import com.xwray.groupie.Item
 import kotlinx.android.synthetic.main.activity_beverage_item.*
-import kotlinx.android.synthetic.main.beverage_item.view.*
+import kotlinx.android.synthetic.main.item_beverage.view.*
 
 class BeverageItemActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -60,14 +60,20 @@ class BeverageItem(
     private val context: Context,
     private val product: Product
 ) : Item<GroupieViewHolder>() {
-    override fun getLayout() = R.layout.beverage_item
+
+    val rs = context.getString(R.string.rs)
+
+    override fun getLayout() = R.layout.item_beverage
 
     override fun bind(viewHolder: GroupieViewHolder, position: Int) {
-        viewHolder.itemView.quantity.text = product.Unit
+        viewHolder.itemView.item_quantity.text = product.Unit
         GlideApp.with(context).load(product.Product_image).placeholder(R.drawable.tea_beverages)
             .into(viewHolder.itemView.productImage)
         viewHolder.itemView.productName.text = product.Product_Name
-        viewHolder.itemView.productPrice.text = "Rs. ${product.Product_Price}"
+        if (product.Discount_Price == "")
+            viewHolder.itemView.productPrice.text = rs + product.Product_Price
+        else
+            viewHolder.itemView.productPrice.text = rs + product.Discount_Price
 
         viewHolder.itemView.setOnClickListener {
             val intent = Intent(context, ItemDetailsActivity::class.java)

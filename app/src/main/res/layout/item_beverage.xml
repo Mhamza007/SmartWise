@@ -28,7 +28,7 @@
                 app:layout_constraintTop_toTopOf="parent">
 
                 <TextView
-                    android:id="@+id/quantity"
+                    android:id="@+id/item_quantity"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/roboto_bold"
@@ -45,7 +45,8 @@
                 android:layout_margin="@dimen/_2sdp"
                 android:src="@drawable/favorite"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                app:tint="@color/colorBg" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

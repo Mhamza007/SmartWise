@@ -47,7 +47,7 @@ class NotificationsActivity : AppCompatActivity() {
 
 class NotificationItem : Item<GroupieViewHolder>() {
     override fun getLayout(): Int {
-        return R.layout.notification_item
+        return R.layout.item_notification
     }
 
     override fun bind(viewHolder: GroupieViewHolder, position: Int) {

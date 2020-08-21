@@ -12,7 +12,7 @@ import com.stackbuffers.groceryclient.R
 import com.stackbuffers.groceryclient.utils.GlideApp
 import com.stackbuffers.groceryclient.utils.SharedPreference
 import kotlinx.android.synthetic.main.activity_my_profile.*
-import kotlinx.android.synthetic.main.cart_item.*
+import kotlinx.android.synthetic.main.item_cart.*
 
 class MyProfileActivity : AppCompatActivity() {
 

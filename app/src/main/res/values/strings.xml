@@ -129,4 +129,12 @@
     <string name="promotion">Promotion</string>
     <string name="sub_total">Sub-Total</string>
     <string name="item_in_cart">Item is in your Cart</string>
+    <string name="dummy_price">Rs. 100</string>
+    <string name="dummy_item_name">Item Name</string>
+    <string name="add">Add</string>
+    <string name="remove">Remove</string>
+    <string name="one">1</string>
+    <string name="product_image">Product Image</string>
+    <string name="rs">"Rs. "</string>
+    <string name="map_image">Map Image</string>
 </resources>

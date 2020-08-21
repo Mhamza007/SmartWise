@@ -74,10 +74,20 @@
                     android:textColor="@android:color/black"
                     android:textSize="@dimen/_15sdp" />
 
-                <Spinner
+                <!--                <Spinner-->
+                <!--                    android:id="@+id/categorySpinner"-->
+                <!--                    android:layout_width="wrap_content"-->
+                <!--                    android:layout_height="wrap_content"-->
+                <!--                    android:layout_marginStart="@dimen/_30sdp"-->
+                <!--                    android:layout_marginTop="@dimen/_10sdp"-->
+                <!--                    app:layout_constraintStart_toEndOf="@+id/cat_txt"-->
+                <!--                    app:layout_constraintTop_toTopOf="parent" />-->
+
+                <com.jaredrummler.materialspinner.MaterialSpinner
                     android:id="@+id/categorySpinner"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    app:ms_text_color="@android:color/black"
                     android:layout_marginStart="@dimen/_30sdp"
                     android:layout_marginTop="@dimen/_10sdp"
                     app:layout_constraintStart_toEndOf="@+id/cat_txt"

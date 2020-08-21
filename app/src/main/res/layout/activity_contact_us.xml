@@ -55,13 +55,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <View
+            <ImageView
                 android:id="@+id/map"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/_250sdp"
+                android:layout_height="wrap_content"
                 android:layout_margin="@dimen/_5sdp"
                 android:background="@color/colorPrimary"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                android:contentDescription="@string/map_image" />
 
             <androidx.cardview.widget.CardView
                 android:id="@+id/contact_us_card"

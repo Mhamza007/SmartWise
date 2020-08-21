@@ -6,18 +6,22 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.stackbuffers.groceryclient.R
+import com.stackbuffers.groceryclient.activities.MainActivity.Companion.productList
 import com.stackbuffers.groceryclient.activities.signin.SignInActivity
 import com.stackbuffers.groceryclient.activities.signup.AddPhoneNumberActivity
 import com.stackbuffers.groceryclient.model.Cart
 import com.stackbuffers.groceryclient.model.Product
+import com.stackbuffers.groceryclient.model.WishList
 import com.stackbuffers.groceryclient.utils.GlideApp
 import com.stackbuffers.groceryclient.utils.SharedPreference
+import com.stackbuffers.groceryclient.utils.Utils
 import kotlinx.android.synthetic.main.activity_item_details.*
 import java.lang.Exception
 
@@ -48,11 +52,7 @@ class ItemDetailsActivity : AppCompatActivity() {
         val productsRef = FirebaseDatabase.getInstance().getReference("/Products/$productId")
         productsRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onCancelled(error: DatabaseError) {
-                Toast.makeText(
-                    this@ItemDetailsActivity,
-                    getString(R.string.db_er),
-                    Toast.LENGTH_SHORT
-                ).show()
+                Utils.dbErToast(this@ItemDetailsActivity)
             }
 
             override fun onDataChange(snapshot: DataSnapshot) {
@@ -63,26 +63,110 @@ class ItemDetailsActivity : AppCompatActivity() {
                         .placeholder(R.drawable.tea_beverages).into(image)
                     name.text = product!!.Product_Name
                     price.text = product!!.Product_Price
-                    quantity.text = product!!.Unit
+                    item_quantity.text = product!!.Unit
                     description.text = product!!.Description
                 }
             }
         })
+
+        val wishListRef = FirebaseDatabase.getInstance().reference
+
+        wishListRef.child("WishList").child(currentUserId)
+            .addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    if (snapshot.exists())
+                        if (snapshot.hasChild(productId!!))
+                            favourite.setColorFilter(
+                                ContextCompat.getColor(
+                                    this@ItemDetailsActivity,
+                                    R.color.colorPrimary
+                                )
+                            )
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    Utils.dbErToast(this@ItemDetailsActivity)
+                }
+
+            })
+
+        favourite.setOnClickListener {
+            wishListRef.child("WishList").child(currentUserId)
+                .addListenerForSingleValueEvent(object : ValueEventListener {
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        // check if item is already in wish list
+                        if (snapshot.hasChild(productId!!)) {
+                            Utils.toast(this@ItemDetailsActivity, "Item is in wishlist")
+                            // item is already in wish list
+                            wishListRef.child("WishList").child(currentUserId)
+                                .child(productId!!)
+                                .removeValue()
+                                .addOnCompleteListener {
+                                    if (it.isSuccessful) {
+                                        favourite.setColorFilter(
+                                            ContextCompat.getColor(
+                                                this@ItemDetailsActivity,
+                                                R.color.colorBg
+                                            )
+                                        )
+                                        Utils.toast(
+                                            this@ItemDetailsActivity,
+                                            "${product!!.Product_Name} Removed"
+                                        )
+                                    } else
+                                        Utils.toast(this@ItemDetailsActivity, "Error")
+                                }.addOnFailureListener {
+                                    Utils.toast(this@ItemDetailsActivity, "Error")
+                                    Log.e(TAG, "Error Adding to wish list ${it.message}")
+                                }
+                        } else {
+                            wishListRef.child("WishList").child(currentUserId)
+                                .child(productId!!).setValue(
+                                    WishList(
+                                        productId!!,
+                                        "${System.currentTimeMillis()}"
+                                    )
+                                ).addOnCompleteListener {
+                                    if (it.isSuccessful) {
+                                        favourite.setColorFilter(
+                                            ContextCompat.getColor(
+                                                this@ItemDetailsActivity,
+                                                R.color.colorPrimary
+                                            )
+                                        )
+                                        Utils.toast(
+                                            this@ItemDetailsActivity,
+                                            "${product!!.Product_Name} added to wish list"
+                                        )
+                                    } else
+                                        Utils.toast(this@ItemDetailsActivity, "Error")
+                                }.addOnFailureListener {
+                                    Utils.toast(this@ItemDetailsActivity, "Error")
+                                    Log.e(TAG, "Error Adding to wish list ${it.message}")
+                                }
+                        }
+                    }
+
+                    override fun onCancelled(error: DatabaseError) {
+                        Utils.dbErToast(this@ItemDetailsActivity)
+                    }
+                })
+        }
 
         //check if item is in cart
         val cartRef = FirebaseDatabase.getInstance().reference
         cartRef.child("Cart").child(currentUserId)
             .addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
-                    if (snapshot.hasChild(productId!!)) {
-                        addToCartBtn.visibility = View.GONE
-                        itemInCartBtn.visibility = View.VISIBLE
-                    }
+                    if (snapshot.exists())
+                        if (snapshot.hasChild(productId!!)) {
+                            addToCartBtn.visibility = View.GONE
+                            itemInCartBtn.visibility = View.VISIBLE
+                        }
                 }
 
                 override fun onCancelled(error: DatabaseError) {
-                    Toast.makeText(this@ItemDetailsActivity, "Database Error", Toast.LENGTH_SHORT)
-                        .show()
+                    Utils.dbErToast(this@ItemDetailsActivity)
                 }
 
             })
@@ -91,9 +175,9 @@ class ItemDetailsActivity : AppCompatActivity() {
             // check if user is signed in
             if (auth.currentUser != null) {
                 Log.d(TAG, "Current User Id $currentUserId")
-                val db =
+                val userRef =
                     FirebaseDatabase.getInstance().getReference("/users")
-                db.addValueEventListener(object : ValueEventListener {
+                userRef.addValueEventListener(object : ValueEventListener {
                     override fun onDataChange(snapshot: DataSnapshot) {
                         val number =
                             snapshot.child(currentUserId).child("Mobile_Number").value.toString()
@@ -117,11 +201,7 @@ class ItemDetailsActivity : AppCompatActivity() {
                     }
 
                     override fun onCancelled(error: DatabaseError) {
-                        Toast.makeText(
-                            this@ItemDetailsActivity,
-                            "Database Error",
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        Utils.dbErToast(this@ItemDetailsActivity)
                     }
 
                 })
@@ -134,15 +214,17 @@ class ItemDetailsActivity : AppCompatActivity() {
     }
 
     private fun addProductToCart(product: Product?) {
+        val time = "${System.currentTimeMillis()}"
         val cartRef = FirebaseDatabase.getInstance().reference
-        //check if item is already in cart
         if (productId != null) {
-            cartRef.child("Cart").child(currentUserId).child(productId!!).setValue(
-                Cart(productId!!, "${System.currentTimeMillis()}")
-            ).addOnCompleteListener {
+            cartRef.child("Cart").child(currentUserId).child(productId!!)
+                .setValue(
+                    Cart(productId!!, time, 1)
+                ).addOnCompleteListener {
+                productList.add(product!!)
                 Toast.makeText(
                     this@ItemDetailsActivity,
-                    "${product!!.Product_Name} Added to cart",
+                    "${product.Product_Name} Added to cart",
                     Toast.LENGTH_SHORT
                 ).show()
                 addToCartBtn.visibility = View.GONE

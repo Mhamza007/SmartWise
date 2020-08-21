@@ -17,7 +17,7 @@ import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
 import com.xwray.groupie.Item
 import kotlinx.android.synthetic.main.activity_beverages.*
-import kotlinx.android.synthetic.main.beverage_list_item.view.*
+import kotlinx.android.synthetic.main.item_beverage_list.view.*
 
 class BeveragesActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -65,7 +65,7 @@ class BeverageListItem(
     private val context: Context,
     private val subCategory: SubCategory
 ) : Item<GroupieViewHolder>() {
-    override fun getLayout() = R.layout.beverage_list_item
+    override fun getLayout() = R.layout.item_beverage_list
 
     override fun bind(viewHolder: GroupieViewHolder, position: Int) {
         GlideApp.with(context).load(subCategory.Image).placeholder(R.drawable.tea_beverages)

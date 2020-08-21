@@ -33,7 +33,7 @@ class OrdersActivity : AppCompatActivity() {
 
 class OrderItem : Item<GroupieViewHolder>() {
     override fun getLayout(): Int {
-        return R.layout.order_item
+        return R.layout.item_order
     }
 
     override fun bind(viewHolder: GroupieViewHolder, position: Int) {
@@ -44,7 +44,7 @@ class OrderItem : Item<GroupieViewHolder>() {
 
 class GrandTotalItem : Item<GroupieViewHolder>() {
     override fun getLayout(): Int {
-        return R.layout.grand_total_item
+        return R.layout.item_grand_total
     }
 
     override fun bind(viewHolder: GroupieViewHolder, position: Int) {

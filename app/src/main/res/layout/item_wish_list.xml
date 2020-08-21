@@ -28,7 +28,8 @@
             android:src="@drawable/tea_beverages"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            android:contentDescription="@string/product_image" />
 
         <TextView
             android:id="@+id/name"
@@ -36,7 +37,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/_30sdp"
             android:fontFamily="@font/roboto_bold"
-            android:text="Pampers"
+            android:text="@string/dummy_item_name"
             android:textSize="@dimen/_15sdp"
             app:layout_constraintStart_toEndOf="@+id/image"
             app:layout_constraintTop_toTopOf="@+id/image" />
@@ -48,7 +49,7 @@
             android:layout_marginStart="@dimen/_30sdp"
             android:layout_marginTop="@dimen/_5sdp"
             android:fontFamily="@font/roboto_bold"
-            android:text="Rs.200"
+            android:text="@string/dummy_price"
             app:layout_constraintStart_toEndOf="@+id/image"
             app:layout_constraintTop_toBottomOf="@+id/name" />
 

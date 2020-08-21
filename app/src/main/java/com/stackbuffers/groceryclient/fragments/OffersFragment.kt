@@ -44,7 +44,7 @@ class OffersFragment : Fragment() {
 
 class OfferItem(private val context: Context) : Item<GroupieViewHolder>() {
     override fun getLayout(): Int {
-        return R.layout.offer_item
+        return R.layout.item_offer
     }
 
     override fun bind(viewHolder: GroupieViewHolder, position: Int) {

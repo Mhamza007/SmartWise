@@ -13,6 +13,7 @@ import com.stackbuffers.groceryclient.R
 import com.stackbuffers.groceryclient.activities.signup.SignUpActivity
 import com.stackbuffers.groceryclient.fragments.HomeFragment
 import com.stackbuffers.groceryclient.fragments.OffersFragment
+import com.stackbuffers.groceryclient.model.Product
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.drawer_header.*
 import kotlinx.android.synthetic.main.nav_drawer_menu.*
@@ -100,6 +101,8 @@ class MainActivity : AppCompatActivity() {
         contactUsMenu.setOnClickListener {
             startActivity(Intent(this@MainActivity, ContactUsActivity::class.java))
         }
+
+        productList = ArrayList()
     }
 
     private var mOnNavigationItemSelectedListener =
@@ -197,5 +200,7 @@ class MainActivity : AppCompatActivity() {
         private const val OFFERS = "OFFERS"
         private const val CART = "CART"
         private const val ME = "ME"
+
+        lateinit var productList: ArrayList<Product>
     }
 }

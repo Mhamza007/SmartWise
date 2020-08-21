@@ -24,7 +24,7 @@ import com.stackbuffers.groceryclient.utils.NewArrivalSliderAdapter
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
 import com.xwray.groupie.Item
-import kotlinx.android.synthetic.main.category_item.view.*
+import kotlinx.android.synthetic.main.item_category.view.*
 import kotlinx.android.synthetic.main.fragment_home.*
 
 class HomeFragment : Fragment() {
@@ -100,7 +100,7 @@ class CategoryItem(
     private val context: Context,
     private val category: Category
 ) : Item<GroupieViewHolder>() {
-    override fun getLayout() = R.layout.category_item
+    override fun getLayout() = R.layout.item_category
 
     override fun bind(viewHolder: GroupieViewHolder, position: Int) {
         GlideApp.with(context).load(category.Category_image).placeholder(R.drawable.tea_beverages)
@@ -118,7 +118,7 @@ class CategoryItem(
 
 class RecommendedItem(private val context: Context) : Item<GroupieViewHolder>() {
     override fun getLayout(): Int {
-        return R.layout.recommended_item
+        return R.layout.item_recommended
     }
 
     override fun bind(viewHolder: GroupieViewHolder, position: Int) {
@@ -127,7 +127,7 @@ class RecommendedItem(private val context: Context) : Item<GroupieViewHolder>() 
 
 class NewArrivalsItem(private val context: Context) : Item<GroupieViewHolder>() {
     override fun getLayout(): Int {
-        return R.layout.new_arrivals_item
+        return R.layout.item_new_arrivals
     }
 
     override fun bind(viewHolder: GroupieViewHolder, position: Int) {
