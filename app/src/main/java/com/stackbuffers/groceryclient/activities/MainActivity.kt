@@ -10,6 +10,8 @@ import androidx.core.view.GravityCompat
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.stackbuffers.groceryclient.R
+import com.stackbuffers.groceryclient.activities.orders.ManualOrderActivity
+import com.stackbuffers.groceryclient.activities.orders.MyOrdersActivity
 import com.stackbuffers.groceryclient.activities.signup.SignUpActivity
 import com.stackbuffers.groceryclient.fragments.HomeFragment
 import com.stackbuffers.groceryclient.fragments.OffersFragment
@@ -43,6 +45,10 @@ class MainActivity : AppCompatActivity() {
         fragmentTransaction.replace(R.id.frame_container, HomeFragment(), HOME)
         fragmentTransaction.addToBackStack(null)
         fragmentTransaction.commit()
+
+        search.setOnClickListener {
+            startActivity(Intent(this@MainActivity, ManualOrderActivity::class.java))
+        }
 
         notifications.setOnClickListener {
             startActivity(Intent(this, NotificationsActivity::class.java))
@@ -83,15 +89,23 @@ class MainActivity : AppCompatActivity() {
         }
 
         myOrdersMenu.setOnClickListener {
-            startActivity(Intent(this@MainActivity, OrdersActivity::class.java))
+            startActivity(Intent(this@MainActivity, MyOrdersActivity::class.java))
         }
 
         favoriteMenu.setOnClickListener {
             startActivity(Intent(this@MainActivity, WishListActivity::class.java))
         }
 
+        returnItemMenu.setOnClickListener {
+            startActivity(Intent(this@MainActivity, ReturnActivity::class.java))
+        }
+
         couponsMenu.setOnClickListener {
             startActivity(Intent(this@MainActivity, CouponsActivity::class.java))
+        }
+
+        shareCartMenu.setOnClickListener {
+            startActivity(Intent(this@MainActivity, ShareCartActivity::class.java))
         }
 
         helpMenu.setOnClickListener {
@@ -102,7 +116,9 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(this@MainActivity, ContactUsActivity::class.java))
         }
 
-        productList = ArrayList()
+        exitMenu.setOnClickListener {
+            finish()
+        }
     }
 
     private var mOnNavigationItemSelectedListener =
@@ -118,6 +134,10 @@ class MainActivity : AppCompatActivity() {
                     Log.d(TAG, "Navigation: Home")
                     toolbarText.text = getString(R.string.home)
                     showHomeFragment()
+                    return@OnNavigationItemSelectedListener true
+                }
+                R.id.action_spin -> {
+                    startActivity(Intent(this, SpinWinActivity::class.java))
                     return@OnNavigationItemSelectedListener true
                 }
                 R.id.action_cart -> {
@@ -201,6 +221,5 @@ class MainActivity : AppCompatActivity() {
         private const val CART = "CART"
         private const val ME = "ME"
 
-        lateinit var productList: ArrayList<Product>
     }
 }

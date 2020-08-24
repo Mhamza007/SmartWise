@@ -137,4 +137,16 @@
     <string name="product_image">Product Image</string>
     <string name="rs">"Rs. "</string>
     <string name="map_image">Map Image</string>
+    <string name="no_of_products">Number of Products</string>
+    <string name="order_price">Order Price</string>
+    <string name="products">Products</string>
+    <string name="return_items">Return Items</string>
+    <string name="zero">0</string>
+    <string name="spin_win"><![CDATA[Spin & Win]]></string>
+    <string name="order_manually">Order Manually</string>
+    <string name="gallery">Gallery</string>
+    <string name="manual">Manual</string>
+    <string name="add_item">Add Item</string>
+    <string name="place_order">Place Order</string>
+    <string name="image_order">Image Order</string>
 </resources>

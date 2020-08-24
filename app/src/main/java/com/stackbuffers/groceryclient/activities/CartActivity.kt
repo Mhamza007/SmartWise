@@ -3,9 +3,7 @@ package com.stackbuffers.groceryclient.activities
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.View
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.firebase.database.DataSnapshot
@@ -23,12 +21,26 @@ import com.xwray.groupie.GroupieViewHolder
 import com.xwray.groupie.Item
 import kotlinx.android.synthetic.main.activity_cart.*
 import kotlinx.android.synthetic.main.item_cart.view.*
+import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
 class CartActivity : AppCompatActivity() {
 
     private lateinit var sharedPreference: SharedPreference
-    lateinit var productsList: ArrayList<Product>
+    private lateinit var cartItemAdapter: GroupAdapter<GroupieViewHolder>
+    private lateinit var productsList: ArrayList<Product>
     var finalPrice: Double = 0.0
+
+    private lateinit var userName: String
+    private lateinit var userAddress: String
+    private lateinit var userNumber: String
+
+    private val usersRef = FirebaseDatabase.getInstance().getReference("/users")
+    val ordersRef = FirebaseDatabase.getInstance().getReference("/Orders")
+    val cartRef = FirebaseDatabase.getInstance().getReference("/Cart")
+    val productsRef = FirebaseDatabase.getInstance().getReference("/Products")
+
+    private lateinit var snaap: DataSnapshot
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,14 +53,26 @@ class CartActivity : AppCompatActivity() {
             finish()
         }
 
-        val cartRef = FirebaseDatabase.getInstance().getReference("/Cart")
-        val productsRef = FirebaseDatabase.getInstance().getReference("/Products")
+        usersRef.child(sharedPreference.getUserId()!!)
+            .addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    if (snapshot.exists()) {
+                        userName = snapshot.child("Name").value.toString()
+                        userAddress = snapshot.child("Address").value.toString()
+                        userNumber = snapshot.child("Mobile_Number").value.toString()
+                    }
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    Utils.dbErToast(this@CartActivity)
+                }
+            })
 
         cartRef.child(sharedPreference.getUserId()!!).addListenerForSingleValueEvent(object :
             ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 if (snapshot.exists()) {
-                    val cartItemAdapter = GroupAdapter<GroupieViewHolder>()
+                    cartItemAdapter = GroupAdapter<GroupieViewHolder>()
 
                     snapshot.children.forEach {
                         productsRef.child(it.key!!)
@@ -111,11 +135,13 @@ class CartActivity : AppCompatActivity() {
         couponsBtn.setOnClickListener {
             startActivity(Intent(this@CartActivity, CouponsActivity::class.java))
         }
+    }
 
-        checkoutLayout.setOnClickListener {
-            val ordersRef = FirebaseDatabase.getInstance().getReference("/Orders")
-
-        }
+    private fun reloadList() {
+        val intent = Intent(this@CartActivity, CartActivity::class.java)
+        startActivity(intent)
+        overridePendingTransition(0, 0)
+        finish()
     }
 
     companion object {
@@ -134,13 +160,17 @@ class CartActivity : AppCompatActivity() {
         private val discountedPrice = snapshot.child("Discount_Price").value.toString()
         private var quantity: Int = 1
 
-        private val cartRef = FirebaseDatabase.getInstance().getReference("/Cart")
-
         override fun getLayout(): Int {
             return R.layout.item_cart
         }
 
         override fun bind(viewHolder: GroupieViewHolder, position: Int) {
+
+            for (i in 0..position) {
+                cartRef.child(sharedPreference.getUserId()!!)
+                    .child(productsList[i].Product_ID)
+                    .child("quantity").setValue(1)
+            }
 
             GlideApp.with(context).load(snapshot.child("Product_image").value)
                 .into(viewHolder.itemView.image)
@@ -179,8 +209,9 @@ class CartActivity : AppCompatActivity() {
             }
 
             viewHolder.itemView.minusCartBtn.setOnClickListener {
-                if (quantity > 0) {
+                if (quantity > 1) {
                     quantity--
+                    viewHolder.itemView.item_quantity.text = quantity.toString()
 
                     cartRef.child(sharedPreference.getUserId()!!)
                         .child(productsList[position].Product_ID).child("quantity")
@@ -203,8 +234,96 @@ class CartActivity : AppCompatActivity() {
                         }
 
                 }
-                if (quantity >= 0)
-                    viewHolder.itemView.item_quantity.text = quantity.toString()
+            }
+
+            viewHolder.itemView.close.setOnClickListener {
+                cartRef.child(sharedPreference.getUserId()!!)
+                    .child(productsList[position].Product_ID)
+                    .removeValue()
+                    .addOnCompleteListener {
+                        if (it.isSuccessful) {
+
+                            reloadList()
+
+                            subTotal.text = finalPrice.toString()
+                            checkoutPrice.text = finalPrice.toString()
+                        }
+                    }.addOnFailureListener {
+                        Utils.toast(context, "Error")
+                    }
+            }
+
+            checkoutLayout.setOnClickListener {
+                val orderId = ordersRef.push().key!!
+                val date = System.currentTimeMillis().toString()
+                val map = HashMap<String, Any>()
+                cartRef.child(sharedPreference.getUserId()!!)
+                    .addListenerForSingleValueEvent(object : ValueEventListener {
+                        override fun onDataChange(cartSnapshot: DataSnapshot) {
+
+                            cartSnapshot.children.forEach {
+
+                                ordersRef
+                                    .child(orderId)
+                                    .child("Products")
+                                    .setValue(cartSnapshot.value)
+                                    .addOnCompleteListener {
+                                        if (it.isSuccessful) {
+                                            map["orderId"] = orderId
+                                            map["date"] = date
+                                            map["status"] = "Pending"
+                                            map["totalPrice"] = finalPrice
+
+                                            map["userId"] = sharedPreference.getUserId()!!
+                                            map["userName"] = userName
+                                            map["mobileNumber"] = userNumber
+                                            map["address"] = userAddress
+
+                                            map["type"] = "direct"
+
+                                            ordersRef
+                                                .child(orderId)
+                                                .updateChildren(map)
+                                                .addOnCompleteListener { task ->
+                                                    if (task.isSuccessful) {
+                                                        cartRef.child(sharedPreference.getUserId()!!)
+                                                            .removeValue()
+                                                        Utils.toast(
+                                                            this@CartActivity,
+                                                            "Order Placed"
+                                                        )
+//                                                        val intent = Intent(
+//                                                            context,
+//                                                            OrderDetailsActivity::class.java
+//                                                        )
+//                                                        intent.putExtra("order_id", orderId)
+//                                                        context.startActivity(intent)
+                                                        finish()
+                                                    } else {
+                                                        Utils.toast(
+                                                            this@CartActivity,
+                                                            "Failed to Order"
+                                                        )
+                                                    }
+                                                }.addOnFailureListener {
+                                                    Utils.toast(
+                                                        this@CartActivity,
+                                                        "Failed to Order"
+                                                    )
+                                                }
+                                        } else {
+                                            Utils.toast(this@CartActivity, "Failed to Order")
+                                        }
+                                    }.addOnFailureListener {
+                                        Utils.toast(this@CartActivity, "Failed to Order")
+                                    }
+                            }
+                        }
+
+                        override fun onCancelled(error: DatabaseError) {
+                            Utils.dbErToast(context)
+                        }
+                    })
             }
         }
     }

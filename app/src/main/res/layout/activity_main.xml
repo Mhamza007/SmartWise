@@ -73,7 +73,7 @@
             android:id="@+id/bottomNavBar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/colorGrey"
+            android:background="@android:color/black"
             app:itemIconTint="@color/colorPrimary"
             app:labelVisibilityMode="labeled"
             app:layout_constraintBottom_toBottomOf="parent"

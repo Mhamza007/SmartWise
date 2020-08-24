@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activities.OrdersActivity">
+    tools:context=".activities.ReturnItemsActivity">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
@@ -32,7 +32,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/_20sdp"
                 android:fontFamily="@font/roboto_bold"
-                android:text="@string/order_details"
+                android:text="@string/return_items"
                 android:textColor="@android:color/white"
                 android:textSize="@dimen/_15sdp"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -53,23 +53,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <TextView
-                android:id="@+id/trackBtn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/_20sdp"
-                android:background="@drawable/track_btn_bg"
-                android:fontFamily="@font/roboto_bold"
-                android:paddingHorizontal="@dimen/_50sdp"
-                android:paddingVertical="@dimen/_10sdp"
-                android:text="@string/track_your_order"
-                android:textAllCaps="false"
-                android:textColor="@android:color/black"
-                android:textSize="@dimen/_15sdp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
             <androidx.cardview.widget.CardView
                 android:id="@+id/delivery_card"
                 android:layout_width="match_parent"
@@ -78,7 +61,7 @@
                 android:layout_marginTop="@dimen/_15sdp"
                 android:layout_marginEnd="@dimen/_10sdp"
                 app:cardCornerRadius="@dimen/_5sdp"
-                app:layout_constraintTop_toBottomOf="@+id/trackBtn">
+                app:layout_constraintTop_toTopOf="parent">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
@@ -91,7 +74,7 @@
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/roboto_bold"
                         android:padding="@dimen/_10sdp"
-                        android:text="@string/delivery_slot"
+                        android:text="@string/order_details"
                         android:textColor="@color/colorPrimary"
                         android:textSize="@dimen/_15sdp"
                         app:layout_constraintStart_toStartOf="parent"
@@ -163,7 +146,7 @@
                             android:layout_weight="2"
                             android:fontFamily="@font/roboto_bold"
                             android:paddingHorizontal="@dimen/_10sdp"
-                            android:text="@string/time"
+                            android:text="@string/price"
                             android:textColor="@android:color/black"
                             android:textSize="@dimen/_13sdp" />
 
@@ -176,12 +159,13 @@
                             android:text="@string/colon" />
 
                         <TextView
-                            android:id="@+id/time"
+                            android:id="@+id/price"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="2"
                             android:fontFamily="@font/roboto_bold"
-                            android:text="@string/dummy_time"
+                            android:gravity="center"
+                            android:text="@string/dummy_price"
                             android:textColor="@android:color/black"
                             android:textSize="@dimen/_13sdp" />
 
@@ -216,7 +200,7 @@
                             android:layout_weight="2"
                             android:fontFamily="@font/roboto_bold"
                             android:paddingHorizontal="@dimen/_10sdp"
-                            android:text="@string/status"
+                            android:text="@string/no_of_products"
                             android:textColor="@android:color/black"
                             android:textSize="@dimen/_13sdp" />
 
@@ -229,88 +213,15 @@
                             android:text="@string/colon" />
 
                         <TextView
-                            android:id="@+id/status"
+                            android:id="@+id/countProducts"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="2"
                             android:fontFamily="@font/roboto_bold"
-                            android:text="@string/dummy_status"
+                            android:gravity="center"
+                            android:text="@string/one"
                             android:textColor="@android:color/black"
                             android:textSize="@dimen/_13sdp" />
-
-                    </LinearLayout>
-
-                </androidx.constraintlayout.widget.ConstraintLayout>
-
-            </androidx.cardview.widget.CardView>
-
-            <androidx.cardview.widget.CardView
-                android:id="@+id/address_card"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/_10sdp"
-                android:layout_marginTop="@dimen/_15sdp"
-                android:layout_marginEnd="@dimen/_10sdp"
-                app:cardCornerRadius="@dimen/_5sdp"
-                app:layout_constraintTop_toBottomOf="@+id/delivery_card">
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:padding="@dimen/_5sdp">
-
-                    <TextView
-                        android:id="@+id/address_text"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="@font/roboto_bold"
-                        android:padding="@dimen/_10sdp"
-                        android:text="@string/address"
-                        android:textColor="@color/colorPrimary"
-                        android:textSize="@dimen/_15sdp"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
-
-                    <TextView
-                        android:id="@+id/address"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="2"
-                        android:fontFamily="@font/roboto_bold"
-                        android:paddingHorizontal="@dimen/_10sdp"
-                        android:text="@string/complete_address"
-                        android:textColor="@android:color/black"
-                        android:textSize="@dimen/_13sdp"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/address_text" />
-
-
-                    <LinearLayout
-                        android:id="@+id/contact_layout"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/_5sdp"
-                        android:orientation="horizontal"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/address">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="@dimen/_10sdp"
-                            android:fontFamily="@font/roboto_bold"
-                            android:text="@string/contact"
-                            android:textColor="@color/colorPrimary"
-                            android:textSize="@dimen/_15sdp"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="@dimen/_10sdp"
-                            android:fontFamily="@font/roboto_bold"
-                            android:text="@string/dummy_number" />
 
                     </LinearLayout>
 
@@ -326,7 +237,7 @@
                 android:layout_marginTop="@dimen/_15sdp"
                 android:layout_marginEnd="@dimen/_10sdp"
                 app:cardCornerRadius="@dimen/_5sdp"
-                app:layout_constraintTop_toBottomOf="@+id/address_card">
+                app:layout_constraintTop_toBottomOf="@+id/delivery_card">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
@@ -334,123 +245,52 @@
                     android:padding="@dimen/_5sdp">
 
                     <TextView
-                        android:id="@+id/orders_payment"
+                        android:id="@+id/products"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/roboto_bold"
                         android:padding="@dimen/_10sdp"
-                        android:text="@string/orders_payment"
+                        android:text="@string/products"
                         android:textColor="@color/colorPrimary"
                         android:textSize="@dimen/_15sdp"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
 
-                    <LinearLayout
-                        android:id="@+id/order_id_layout"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/orders_payment">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:fontFamily="@font/roboto_bold"
-                            android:text="@string/order_id"
-                            android:textColor="#DB0311" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:fontFamily="@font/roboto_bold"
-                            android:padding="@dimen/_5sdp"
-                            android:text="@string/colon"
-                            android:textColor="#DB0311" />
-
-                        <TextView
-                            android:id="@+id/orderId"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:fontFamily="@font/roboto_bold"
-                            android:text="@string/dummy_order_id"
-                            android:textColor="@android:color/black" />
-
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:id="@+id/table_layout"
+                    <androidx.core.widget.NestedScrollView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:padding="@dimen/_5sdp"
-                        android:weightSum="8"
-                        app:layout_constraintTop_toBottomOf="@+id/order_id_layout">
+                        app:layout_constraintTop_toBottomOf="@+id/products">
 
-                        <TextView
-                            android:layout_width="wrap_content"
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/orderProductsList"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_weight="4"
-                            android:fontFamily="@font/roboto_bold"
-                            android:text="@string/item_name"
-                            android:textColor="@color/colorPrimary"
-                            android:textSize="@dimen/_15sdp"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent" />
+                            android:nestedScrollingEnabled="false" />
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:fontFamily="@font/roboto_bold"
-                            android:gravity="center"
-                            android:text="@string/qty"
-                            android:textColor="@color/colorPrimary"
-                            android:textSize="@dimen/_15sdp"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="3"
-                            android:fontFamily="@font/roboto_bold"
-                            android:gravity="center"
-                            android:text="@string/price"
-                            android:textColor="@color/colorPrimary"
-                            android:textSize="@dimen/_15sdp"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent" />
-
-                    </LinearLayout>
-
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/orderItemsList"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        app:layout_constraintTop_toBottomOf="@+id/table_layout" />
+                    </androidx.core.widget.NestedScrollView>
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
             </androidx.cardview.widget.CardView>
 
             <Button
+                android:id="@+id/returnItems"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/_10sdp"
                 android:background="@color/colorPrimary"
-                android:text="@string/cancel_order"
-                android:textColor="@android:color/white"
                 android:fontFamily="@font/roboto_bold"
-                android:textSize="@dimen/_18sdp"
                 android:padding="@dimen/_10sdp"
+                android:text="@string/return_items"
                 android:textAllCaps="false"
-                app:layout_constraintTop_toBottomOf="@+id/payment_card"
-                app:layout_constraintBottom_toBottomOf="parent"/>
+                android:textColor="@android:color/white"
+                android:textSize="@dimen/_18sdp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/payment_card" />
+
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </ScrollView>
-
 </androidx.constraintlayout.widget.ConstraintLayout>

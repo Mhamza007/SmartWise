@@ -13,7 +13,6 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.stackbuffers.groceryclient.R
-import com.stackbuffers.groceryclient.activities.MainActivity.Companion.productList
 import com.stackbuffers.groceryclient.activities.signin.SignInActivity
 import com.stackbuffers.groceryclient.activities.signup.AddPhoneNumberActivity
 import com.stackbuffers.groceryclient.model.Cart
@@ -62,7 +61,10 @@ class ItemDetailsActivity : AppCompatActivity() {
                     GlideApp.with(this@ItemDetailsActivity).load(product!!.Product_image)
                         .placeholder(R.drawable.tea_beverages).into(image)
                     name.text = product!!.Product_Name
-                    price.text = product!!.Product_Price
+                    if (product!!.Discount_Price == "")
+                        price.text = product!!.Product_Price
+                    else
+                        price.text = product!!.Discount_Price
                     item_quantity.text = product!!.Unit
                     description.text = product!!.Description
                 }
@@ -96,7 +98,7 @@ class ItemDetailsActivity : AppCompatActivity() {
                     override fun onDataChange(snapshot: DataSnapshot) {
                         // check if item is already in wish list
                         if (snapshot.hasChild(productId!!)) {
-                            Utils.toast(this@ItemDetailsActivity, "Item is in wishlist")
+                            Utils.toast(this@ItemDetailsActivity, "Item is in wish list")
                             // item is already in wish list
                             wishListRef.child("WishList").child(currentUserId)
                                 .child(productId!!)
@@ -216,27 +218,36 @@ class ItemDetailsActivity : AppCompatActivity() {
     private fun addProductToCart(product: Product?) {
         val time = "${System.currentTimeMillis()}"
         val cartRef = FirebaseDatabase.getInstance().reference
-        if (productId != null) {
-            cartRef.child("Cart").child(currentUserId).child(productId!!)
-                .setValue(
-                    Cart(productId!!, time, 1)
-                ).addOnCompleteListener {
-                productList.add(product!!)
-                Toast.makeText(
-                    this@ItemDetailsActivity,
-                    "${product.Product_Name} Added to cart",
-                    Toast.LENGTH_SHORT
-                ).show()
-                addToCartBtn.visibility = View.GONE
-                itemInCartBtn.visibility = View.VISIBLE
-            }.addOnFailureListener {
-                Toast.makeText(
-                    this@ItemDetailsActivity,
-                    "Can't add product to cart, Try Again",
-                    Toast.LENGTH_SHORT
-                ).show()
+        if (product != null)
+            if (productId != null) {
+                val price =
+                    if (product.Discount_Price == "") product.Product_Price else product.Discount_Price
+                cartRef.child("Cart").child(currentUserId).child(productId!!)
+                    .setValue(
+                        Cart(
+                            productId!!,
+                            time,
+                            product.Product_Name,
+                            product.Product_image,
+                            price,
+                            1
+                        )
+                    ).addOnCompleteListener {
+                        Toast.makeText(
+                            this@ItemDetailsActivity,
+                            "${product.Product_Name} Added to cart",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        addToCartBtn.visibility = View.GONE
+                        itemInCartBtn.visibility = View.VISIBLE
+                    }.addOnFailureListener {
+                        Toast.makeText(
+                            this@ItemDetailsActivity,
+                            "Can't add product to cart, Try Again",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
             }
-        }
     }
 
     companion object {
