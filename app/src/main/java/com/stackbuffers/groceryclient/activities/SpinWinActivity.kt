@@ -88,8 +88,14 @@ class SpinWinActivity : AppCompatActivity() {
         usersRef.child(sharedPreference.getUserId()!!).addListenerForSingleValueEvent(
             object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
-                    val spinTime = snapshot.child("SpinTime").value.toString().toLong()
-                    spin.isEnabled = currentTime - oneDay >= spinTime
+                    if (snapshot.exists()) {
+                        if (snapshot.hasChild("SpinTime")) {
+                            val spinTime = snapshot.child("SpinTime").value.toString().toLong()
+                            spin.isEnabled = currentTime - oneDay >= spinTime
+                        } else {
+                            spin.isEnabled = true
+                        }
+                    }
                 }
 
                 override fun onCancelled(error: DatabaseError) {
@@ -163,6 +169,7 @@ class SpinWinActivity : AppCompatActivity() {
                                         this@SpinWinActivity,
                                         "$points points added"
                                     )
+                                    spin.isEnabled = false
                                 }.addOnFailureListener {
                                     Utils.toast(
                                         this@SpinWinActivity,
@@ -175,17 +182,16 @@ class SpinWinActivity : AppCompatActivity() {
                             usersRef.child(sharedPreference.getUserId()!!)
                                 .updateChildren(map)
                                 .addOnCompleteListener {
-                                    Toast.makeText(
+                                    Utils.toast(
                                         this@SpinWinActivity,
-                                        "$points points added",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
+                                        "$points points added"
+                                    )
+                                    spin.isEnabled = false
                                 }.addOnFailureListener {
-                                    Toast.makeText(
+                                    Utils.toast(
                                         this@SpinWinActivity,
-                                        "Failed",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
+                                        "Failed"
+                                    )
                                 }
                         }
                     }

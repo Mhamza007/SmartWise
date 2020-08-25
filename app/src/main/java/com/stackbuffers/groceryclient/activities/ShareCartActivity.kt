@@ -72,7 +72,6 @@ class UserItem(private val context: Context, private val dataSnapshot: DataSnaps
                             }.addOnFailureListener {
                                 Utils.toast(context, "Failed to share Cart")
                             }
-
                     }
 
                     override fun onCancelled(error: DatabaseError) {
@@ -81,7 +80,5 @@ class UserItem(private val context: Context, private val dataSnapshot: DataSnaps
                 })
         }
     }
-
     override fun getLayout() = R.layout.item_user
-
 }

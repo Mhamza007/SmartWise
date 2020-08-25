@@ -88,7 +88,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="@dimen/_5sdp"
                         android:fontFamily="@font/roboto_regular"
-                        android:text="@string/gold"
+                        android:text="@string/silver"
                         android:textColor="@android:color/black"
                         app:layout_constraintBottom_toBottomOf="@+id/coin"
                         app:layout_constraintStart_toEndOf="@+id/coin"
