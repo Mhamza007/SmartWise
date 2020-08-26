@@ -32,6 +32,10 @@ class SpinWinActivity : AppCompatActivity() {
         sharedPreference = SharedPreference(this@SpinWinActivity)
         data = ArrayList()
 
+        back.setOnClickListener {
+            finish()
+        }
+
         val luckyWheelView = findViewById<LuckyWheelView>(R.id.wheel)
 
         luckyWheelView.isEnabled = false

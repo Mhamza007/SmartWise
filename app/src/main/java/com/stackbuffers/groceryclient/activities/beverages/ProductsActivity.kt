@@ -13,13 +13,20 @@ import com.google.firebase.database.ValueEventListener
 import com.stackbuffers.groceryclient.R
 import com.stackbuffers.groceryclient.model.Product
 import com.stackbuffers.groceryclient.utils.GlideApp
+import com.stackbuffers.groceryclient.utils.Utils
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
 import com.xwray.groupie.Item
 import kotlinx.android.synthetic.main.activity_beverage_item.*
 import kotlinx.android.synthetic.main.item_beverage.view.*
+import java.lang.Exception
 
-class BeverageItemActivity : AppCompatActivity() {
+class ProductsActivity : AppCompatActivity() {
+
+    private var categoryId: String? = ""
+    private var subCategoryId: String? = ""
+    val productsRef = FirebaseDatabase.getInstance().getReference("/Products")
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_beverage_item)
@@ -28,30 +35,33 @@ class BeverageItemActivity : AppCompatActivity() {
             finish()
         }
 
-        val ref = FirebaseDatabase.getInstance().getReference("/Products")
-        ref.addListenerForSingleValueEvent(object : ValueEventListener {
+        try {
+            categoryId = intent.getStringExtra("category_id")
+            subCategoryId = intent.getStringExtra("sub_category_id")
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
+        productsRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onCancelled(error: DatabaseError) {
-                Toast.makeText(
-                    this@BeverageItemActivity,
-                    getString(R.string.db_er),
-                    Toast.LENGTH_SHORT
-                ).show()
+                Utils.dbErToast(this@ProductsActivity)
             }
 
             override fun onDataChange(snapshot: DataSnapshot) {
                 val beverageItemsAdapter = GroupAdapter<GroupieViewHolder>()
 
                 snapshot.children.forEach {
-                    val product = it.getValue(Product::class.java)
-                    if (product != null) {
-                        beverageItemsAdapter.add(BeverageItem(this@BeverageItemActivity, product))
+                    if (it.child("Category_ID").value.toString() == categoryId && it.child("SubCategory_ID").value.toString() == subCategoryId) {
+                        val product = it.getValue(Product::class.java)
+                        if (product != null) {
+                            beverageItemsAdapter.add(BeverageItem(this@ProductsActivity, product))
+                        }
                     }
-                    beverageItemsList.layoutManager =
-                        GridLayoutManager(this@BeverageItemActivity, 3)
-                    beverageItemsList.adapter = beverageItemsAdapter
                 }
+                beverageItemsList.layoutManager =
+                    GridLayoutManager(this@ProductsActivity, 3)
+                beverageItemsList.adapter = beverageItemsAdapter
             }
-
         })
     }
 }

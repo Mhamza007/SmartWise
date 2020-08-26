@@ -21,9 +21,9 @@
             <ImageView
                 android:id="@+id/close"
                 android:layout_width="wrap_content"
-                android:padding="@dimen/_10sdp"
                 android:layout_height="wrap_content"
                 android:contentDescription="@string/close"
+                android:padding="@dimen/_10sdp"
                 android:src="@drawable/close"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -92,12 +92,20 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/todayNotifications"
+            <androidx.core.widget.NestedScrollView
+                android:id="@+id/todayNotificationsView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/_15sdp"
-                app:layout_constraintTop_toBottomOf="@+id/todayClear" />
+                app:layout_constraintTop_toBottomOf="@+id/todayClear">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/todayNotifications"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:nestedScrollingEnabled="false" />
+
+            </androidx.core.widget.NestedScrollView>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -107,7 +115,7 @@
                 android:text="@string/yesterday"
                 android:textSize="@dimen/_10sdp"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/todayNotifications" />
+                app:layout_constraintTop_toBottomOf="@+id/todayNotificationsView" />
 
             <TextView
                 android:id="@+id/yesterdayClear"
@@ -118,14 +126,22 @@
                 android:text="@string/clear_all"
                 android:textSize="@dimen/_10sdp"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/todayNotifications" />
+                app:layout_constraintTop_toBottomOf="@+id/todayNotificationsView" />
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/yesterdayNotifications"
+            <androidx.core.widget.NestedScrollView
+                android:id="@+id/yesterdayNotificationsView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/_15sdp"
-                app:layout_constraintTop_toBottomOf="@+id/yesterdayClear" />
+                app:layout_constraintTop_toBottomOf="@+id/yesterdayClear">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/yesterdayNotifications"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:nestedScrollingEnabled="false" />
+
+            </androidx.core.widget.NestedScrollView>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -135,7 +151,7 @@
                 android:text="@string/last_week"
                 android:textSize="@dimen/_10sdp"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/yesterdayNotifications" />
+                app:layout_constraintTop_toBottomOf="@+id/yesterdayNotificationsView" />
 
             <TextView
                 android:id="@+id/lastWeekClear"
@@ -146,14 +162,22 @@
                 android:text="@string/clear_all"
                 android:textSize="@dimen/_10sdp"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/yesterdayNotifications" />
+                app:layout_constraintTop_toBottomOf="@+id/yesterdayNotificationsView" />
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/lastWeekNotifications"
+            <androidx.core.widget.NestedScrollView
+                android:id="@+id/lastWeekNotificationsView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/_15sdp"
-                app:layout_constraintTop_toBottomOf="@+id/lastWeekClear" />
+                app:layout_constraintTop_toBottomOf="@+id/lastWeekClear">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/lastWeekNotifications"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:nestedScrollingEnabled="false" />
+
+            </androidx.core.widget.NestedScrollView>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

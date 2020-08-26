@@ -114,7 +114,7 @@ class ManualOrderActivity : AppCompatActivity() {
             }
             // Gallery
             if (requestCode == GALLERY_REQUEST) {
-                val actualImage = FileUtil.from(this@ManualOrderActivity, data.data!!).let {
+                FileUtil.from(this@ManualOrderActivity, data.data!!).let {
                     Log.d(TAG, "Image ${it.path}")
                     val intent = Intent(this@ManualOrderActivity, ImageOrderActivity::class.java)
                     intent.putExtra("gallery", it.path)

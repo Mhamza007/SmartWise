@@ -23,6 +23,7 @@ import java.util.*
 class ReturnActivity : AppCompatActivity() {
 
     private val ordersRef = FirebaseDatabase.getInstance().getReference("/Orders")
+    private val returnRef = FirebaseDatabase.getInstance().getReference("/Return")
     private lateinit var sharedPreference: SharedPreference
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -35,12 +36,35 @@ class ReturnActivity : AppCompatActivity() {
             finish()
         }
 
-        ordersRef.child(sharedPreference.getUserId()!!)
+        ordersRef
             .addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     val adapter = GroupAdapter<GroupieViewHolder>()
                     for (snap in snapshot.children) {
-                        adapter.add(OrderItem(this@ReturnActivity, snap))
+                        val status = snap.child("status").value
+                        status?.let {
+                            if (it.toString().equals(
+                                    "Delivered",
+                                    ignoreCase = true
+                                ) && snap.child("userId").value.toString() ==
+                                sharedPreference.getUserId()!! &&
+                                snap.child("type").value.toString()
+                                    .equals("direct", ignoreCase = true)
+                            ) {
+                                returnRef.addListenerForSingleValueEvent(object :
+                                    ValueEventListener {
+                                    override fun onDataChange(snapshot: DataSnapshot) {
+                                        if (!snapshot.hasChild(snap.key.toString())) {
+                                            adapter.add(OrderItem(this@ReturnActivity, snap))
+                                        }
+                                    }
+
+                                    override fun onCancelled(error: DatabaseError) {
+                                        Utils.dbErToast(this@ReturnActivity)
+                                    }
+                                })
+                            }
+                        }
                     }
                     ordersList.layoutManager = LinearLayoutManager(this@ReturnActivity)
                     ordersList.adapter = adapter
@@ -49,7 +73,6 @@ class ReturnActivity : AppCompatActivity() {
                 override fun onCancelled(error: DatabaseError) {
                     Utils.dbErToast(this@ReturnActivity)
                 }
-
             })
     }
 

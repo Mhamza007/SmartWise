@@ -10,7 +10,6 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.stackbuffers.groceryclient.R
-import com.stackbuffers.groceryclient.activities.OrderDetailsActivity
 import com.stackbuffers.groceryclient.utils.SharedPreference
 import com.stackbuffers.groceryclient.utils.Utils
 import com.xwray.groupie.GroupAdapter
@@ -70,7 +69,11 @@ class OrderItem(
         calendar.timeInMillis = dateInMillis.toLong()
         val formatter = SimpleDateFormat("dd-MM-yyyy")
         viewHolder.itemView.orderDate.text = formatter.format(calendar.time)
-        viewHolder.itemView.orderPrice.text = snap.child("totalPrice").value.toString()
+        if (snap.hasChild("totalPrice")) {
+            viewHolder.itemView.orderPrice.text = snap.child("totalPrice").value.toString()
+        } else {
+            viewHolder.itemView.orderPrice.text = context.getString(R.string.manual)
+        }
         viewHolder.itemView.productCount.text = snap.child("Products").childrenCount.toString()
 
         viewHolder.itemView.setOnClickListener {

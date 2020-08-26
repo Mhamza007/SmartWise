@@ -43,10 +43,12 @@
         android:layout_marginBottom="@dimen/_20sdp"
         android:contentDescription="@string/camera"
         android:src="@drawable/camera"
+        android:tintMode="add"
         app:layout_constraintBottom_toBottomOf="@+id/profileImage"
         app:layout_constraintEnd_toEndOf="@+id/profileImage"
         app:layout_constraintStart_toEndOf="@+id/profileImage"
-        app:layout_constraintTop_toTopOf="@+id/profileImage" />
+        app:layout_constraintTop_toTopOf="@+id/profileImage"
+        app:tint="@color/colorPrimary" />
 
     <ScrollView
         android:layout_width="match_parent"
@@ -72,34 +74,32 @@
                     android:layout_height="wrap_content">
 
                     <ImageView
-                        android:id="@+id/coin"
+                        android:id="@+id/silverCoin"
                         android:layout_width="@dimen/_25sdp"
                         android:layout_height="@dimen/_25sdp"
                         android:layout_marginVertical="@dimen/_5sdp"
                         android:layout_marginStart="@dimen/_10sdp"
                         android:contentDescription="@string/coin"
-                        android:src="@drawable/coin"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
 
                     <TextView
+                        android:id="@+id/userCate"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="@dimen/_5sdp"
                         android:fontFamily="@font/roboto_regular"
-                        android:text="@string/silver"
                         android:textColor="@android:color/black"
-                        app:layout_constraintBottom_toBottomOf="@+id/coin"
-                        app:layout_constraintStart_toEndOf="@+id/coin"
-                        app:layout_constraintTop_toTopOf="@+id/coin" />
+                        app:layout_constraintBottom_toBottomOf="@+id/silverCoin"
+                        app:layout_constraintStart_toEndOf="@+id/silverCoin"
+                        app:layout_constraintTop_toTopOf="@+id/silverCoin" />
 
                     <TextView
-                        android:id="@+id/coins"
+                        android:id="@+id/points"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="@dimen/_5sdp"
-                        android:text="100"
                         android:textColor="#E5B209"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toStartOf="@id/coins_txt"
@@ -109,8 +109,8 @@
                         android:id="@+id/coins_txt"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/coins"
                         android:layout_marginEnd="@dimen/_5sdp"
+                        android:text="@string/user_points"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
@@ -143,8 +143,10 @@
                     android:layout_width="@dimen/_35sdp"
                     android:layout_height="@dimen/_35sdp"
                     android:layout_gravity="center"
+                    android:contentDescription="@string/user_name"
                     android:padding="@dimen/_10sdp"
-                    android:src="@drawable/user" />
+                    android:src="@drawable/user"
+                    app:tint="@color/colorPrimary" />
 
                 <TextView
                     android:id="@+id/userName"
@@ -183,8 +185,10 @@
                     android:layout_width="@dimen/_35sdp"
                     android:layout_height="@dimen/_35sdp"
                     android:layout_gravity="center"
+                    android:contentDescription="@string/user_email"
                     android:padding="@dimen/_10sdp"
-                    android:src="@drawable/email" />
+                    android:src="@drawable/email"
+                    app:tint="@color/colorPrimary" />
 
                 <TextView
                     android:id="@+id/userEmail"
@@ -223,8 +227,10 @@
                     android:layout_width="@dimen/_35sdp"
                     android:layout_height="@dimen/_35sdp"
                     android:layout_gravity="center"
+                    android:contentDescription="@string/user_city"
                     android:padding="@dimen/_10sdp"
-                    android:src="@drawable/flag" />
+                    android:src="@drawable/flag"
+                    app:tint="@color/colorPrimary" />
 
                 <TextView
                     android:id="@+id/userCity"
@@ -263,8 +269,10 @@
                     android:layout_width="@dimen/_35sdp"
                     android:layout_height="@dimen/_35sdp"
                     android:layout_gravity="center"
+                    android:contentDescription="@string/user_number"
                     android:padding="@dimen/_10sdp"
-                    android:src="@drawable/smartphone" />
+                    android:src="@drawable/smartphone"
+                    app:tint="@color/colorPrimary" />
 
                 <TextView
                     android:id="@+id/userNumber"
@@ -305,6 +313,7 @@
                     android:layout_width="@dimen/_35sdp"
                     android:layout_height="@dimen/_35sdp"
                     android:layout_gravity="center"
+                    app:tint="@color/colorPrimary"
                     android:contentDescription="@string/address"
                     android:padding="@dimen/_10sdp"
                     android:src="@drawable/address_pin" />

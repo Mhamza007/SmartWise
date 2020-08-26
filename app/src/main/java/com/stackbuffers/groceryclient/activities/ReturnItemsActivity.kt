@@ -3,6 +3,7 @@ package com.stackbuffers.groceryclient.activities
 import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -27,14 +28,13 @@ class ReturnItemsActivity : AppCompatActivity() {
     private lateinit var sharedPreference: SharedPreference
     private val ordersRef = FirebaseDatabase.getInstance().getReference("/Orders")
     private val returnRef = FirebaseDatabase.getInstance().getReference("/Return")
+    private val returningRef = FirebaseDatabase.getInstance().getReference("/Returning")
     private var orderId: String? = null
-    private lateinit var productsList: ArrayList<Product>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_return_items)
 
-        productsList = ArrayList()
         sharedPreference = SharedPreference(this@ReturnItemsActivity)
 
         try {
@@ -48,7 +48,7 @@ class ReturnItemsActivity : AppCompatActivity() {
         }
 
         orderId?.let {
-            ordersRef.child(sharedPreference.getUserId()!!).child(orderId!!)
+            ordersRef.child(it)
                 .addListenerForSingleValueEvent(object : ValueEventListener {
                     override fun onDataChange(snapshot: DataSnapshot) {
                         if (snapshot.exists()) {
@@ -57,33 +57,22 @@ class ReturnItemsActivity : AppCompatActivity() {
                             calendar.timeInMillis = dateInMillis.toLong()
                             val formatter = SimpleDateFormat("dd-MM-yyyy")
                             date.text = formatter.format(calendar.time)
-                            price.text = snapshot.child("totalPrice").value.toString()
+                            if (snapshot.hasChild("totalPrice"))
+                                price.text = snapshot.child("totalPrice").value.toString()
+                            else
+                                price.text = getString(R.string.manual)
                             countProducts.text = snapshot.child("Products").childrenCount.toString()
 
-                            ordersRef.child(sharedPreference.getUserId()!!).child(orderId!!)
+                            ordersRef.child(orderId!!)
                                 .child("Products").addListenerForSingleValueEvent(
                                     object : ValueEventListener {
                                         override fun onDataChange(snapshot: DataSnapshot) {
                                             val adapter = GroupAdapter<GroupieViewHolder>()
                                             snapshot.children.forEach {
-                                                productsList.add(
-                                                    Product(
-                                                        "",
-                                                        "",
-                                                        snapshot.child("productPrice").value.toString(),
-                                                        snapshot.child("productId").value.toString(),
-                                                        snapshot.child("productName").value.toString(),
-                                                        snapshot.child("productPrice").value.toString(),
-                                                        snapshot.child("productImage").value.toString(),
-                                                        "",
-                                                        ""
-                                                    )
-                                                )
                                                 adapter.add(
                                                     OrderProductItem(
                                                         this@ReturnItemsActivity,
-                                                        it,
-                                                        productsList
+                                                        it
                                                     )
                                                 )
                                             }
@@ -109,26 +98,46 @@ class ReturnItemsActivity : AppCompatActivity() {
 
     inner class OrderProductItem(
         private val context: Context,
-        private val snapshot: DataSnapshot,
-        private val productsList: ArrayList<Product>
+        private val dataSnapshot: DataSnapshot
     ) :
         Item<GroupieViewHolder>() {
         var returnQuantity = 0
+        private val prodList = HashMap<String, Any>()
+
         override fun bind(viewHolder: GroupieViewHolder, position: Int) {
-            val quantity = snapshot.child("quantity").value.toString().toInt()
-            GlideApp.with(context).load(snapshot.child("productImage").value.toString())
+
+            Log.d("dataSnapshot", "dataSnapshot $dataSnapshot")
+
+            ordersRef.child(orderId!!)
+                .addListenerForSingleValueEvent(object : ValueEventListener {
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        returningRef.child(orderId!!).setValue(snapshot.value)
+                    }
+
+                    override fun onCancelled(error: DatabaseError) {
+                        Utils.dbErToast(context)
+                    }
+                })
+
+            val quantity = dataSnapshot.child("quantity").value.toString().toInt()
+            GlideApp.with(context).load(dataSnapshot.child("productImage").value.toString())
                 .placeholder(R.drawable.tea_beverages)
                 .into(viewHolder.itemView.orderProductImage)
-            viewHolder.itemView.productName.text = snapshot.child("productName").value.toString()
-            viewHolder.itemView.productPrice.text =
-                context.getString(R.string.rs) + snapshot.child("productPrice").value.toString()
-            viewHolder.itemView.productQty.text = snapshot.child("quantity").value.toString()
+            viewHolder.itemView.productName.text =
+                dataSnapshot.child("productName").value.toString()
+            if (dataSnapshot.hasChild("productPrice"))
+                viewHolder.itemView.productPrice.text =
+                    context.getString(R.string.rs) + dataSnapshot.child("productPrice").value.toString()
+            else
+                viewHolder.itemView.productPrice.text = context.getString(R.string.manual)
+            viewHolder.itemView.productQty.text = dataSnapshot.child("quantity").value.toString()
 
             viewHolder.itemView.item_quantity.text = returnQuantity.toString()
 
             viewHolder.itemView.minusCartBtn.setOnClickListener {
                 if (returnQuantity > 0) {
                     returnQuantity--
+                    updateQuantity(returnQuantity)
                     viewHolder.itemView.item_quantity.text = returnQuantity.toString()
                 }
             }
@@ -136,40 +145,32 @@ class ReturnItemsActivity : AppCompatActivity() {
             viewHolder.itemView.addCartBtn.setOnClickListener {
                 if (returnQuantity < quantity) {
                     returnQuantity++
+                    updateQuantity(returnQuantity)
                     viewHolder.itemView.item_quantity.text = returnQuantity.toString()
                 }
             }
 
             returnItems.setOnClickListener {
-                ordersRef.child(sharedPreference.getUserId()!!).child(orderId!!)
+                returningRef.child(orderId!!)
                     .addListenerForSingleValueEvent(object : ValueEventListener {
                         override fun onDataChange(snapshot: DataSnapshot) {
-                            returnRef.child(sharedPreference.getUserId()!!)
+                            returnRef
                                 .child(orderId!!)
                                 .setValue(snapshot.value)
                                 .addOnCompleteListener {
                                     if (it.isSuccessful) {
-                                        val map = HashMap<String, Any>()
-                                        map["returnQuantity"] = returnQuantity
-                                        returnRef.child(sharedPreference.getUserId()!!)
-                                            .child(orderId!!)
-                                            .child("Products")
-                                            .addListenerForSingleValueEvent(object : ValueEventListener {
-                                                override fun onDataChange(snapshot: DataSnapshot) {
-                                                    for (snap in snapshot.children) {
-                                                        returnRef.child(sharedPreference.getUserId()!!)
-                                                            .child(orderId!!)
-                                                            .child("Products")
-                                                            .child(snap.child("productId").value.toString())
-                                                            .updateChildren(map)
-                                                    }
+                                        returningRef.child(orderId!!)
+                                            .removeValue()
+                                            .addOnCompleteListener {
+                                                if (it.isSuccessful) {
+                                                    Utils.toast(context, "Return Requested")
+                                                    finish()
+                                                } else {
+                                                    Utils.toast(context, "Failed to Request Return")
                                                 }
-
-                                                override fun onCancelled(error: DatabaseError) {
-                                                    Utils.dbErToast(context)
-                                                }
-
-                                            })
+                                            }.addOnFailureListener {
+                                                Utils.toast(context, "Failed to Request Return")
+                                            }
                                     } else {
                                         Utils.toast(context, "Error")
                                     }
@@ -185,5 +186,40 @@ class ReturnItemsActivity : AppCompatActivity() {
 
         override fun getLayout() = R.layout.item_completed_order_product
 
+        private fun updateQuantity(returnQuantity: Int): Boolean {
+            var updated = false
+            returningRef.addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    if (snapshot.hasChild(orderId!!))
+                        returningRef.child(orderId!!).child("Products")
+                            .addListenerForSingleValueEvent(object :
+                                ValueEventListener {
+                                override fun onDataChange(snapshot: DataSnapshot) {
+                                    snapshot.children.forEach {
+                                        returningRef.child(orderId!!)
+                                            .child("Products")
+                                            .child(dataSnapshot.child("productId").value.toString())
+                                            .child("returnQuantity")
+                                            .setValue(returnQuantity)
+                                            .addOnCompleteListener { update ->
+                                                updated = update.isSuccessful
+                                            }.addOnFailureListener {
+                                                updated = false
+                                            }
+                                    }
+                                }
+
+                                override fun onCancelled(error: DatabaseError) {
+                                    Utils.dbErToast(context)
+                                }
+                            })
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    Utils.dbErToast(context)
+                }
+            })
+            return updated
+        }
     }
 }

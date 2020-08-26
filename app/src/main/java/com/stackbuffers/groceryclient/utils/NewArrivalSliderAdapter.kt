@@ -1,29 +1,55 @@
-package com.stackbuffers.groceryclient.utils;
+package com.stackbuffers.groceryclient.utils
 
-import com.stackbuffers.groceryclient.R;
+import android.content.Context
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
+import com.stackbuffers.groceryclient.R
+import com.stackbuffers.groceryclient.model.Banner
+import ss.com.bannerslider.adapters.SliderAdapter
+import ss.com.bannerslider.viewholder.ImageSlideViewHolder
 
-import ss.com.bannerslider.adapters.SliderAdapter;
-import ss.com.bannerslider.viewholder.ImageSlideViewHolder;
+class NewArrivalSliderAdapter(private val context: Context) : SliderAdapter() {
+    private val bannersRef = FirebaseDatabase.getInstance().getReference("/Banners")
+    private var bannerList: ArrayList<Banner> = ArrayList()
 
-public class NewArrivalSliderAdapter extends SliderAdapter {
+    init {
+        bannersRef.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                snapshot.children.forEach {
+                    if (it.hasChild("Banner_Type") && it.child("Banner_Type").value.toString()
+                            .equals("NewArrival", ignoreCase = true)
+                    ) {
+                        bannerList.add(
+                            Banner(
+                                it.child("Banner_ID").value.toString(),
+                                it.child("Banner_Image").value.toString(),
+                                it.child("Banner_Type").value.toString(),
+                                it.child("Category_ID").value.toString(),
+                                it.child("Product_ID").value.toString(),
+                                it.child("Sub_Categories_ID").value.toString()
+                            )
+                        )
+                    }
+                }
+            }
 
-    @Override
-    public int getItemCount() {
-        return 3;
+            override fun onCancelled(error: DatabaseError) {
+                Utils.dbErToast(context)
+            }
+        })
     }
 
-    @Override
-    public void onBindImageSlide(int position, ImageSlideViewHolder viewHolder) {
-        switch (position) {
-            case 0:
-                viewHolder.bindImageSlide(R.drawable.new_arrivals);
-                break;
-            case 1:
-                viewHolder.bindImageSlide(R.drawable.new_arrivals);
-                break;
-            case 2:
-                viewHolder.bindImageSlide(R.drawable.new_arrivals);
-                break;
+    override fun getItemCount(): Int {
+        return bannerList.size
+    }
+
+    override fun onBindImageSlide(position: Int, viewHolder: ImageSlideViewHolder) {
+        for (i in 0 until bannerList.size) {
+            when (position) {
+                i -> viewHolder.bindImageSlide(bannerList[position].Banner_Image)
+            }
         }
     }
 }

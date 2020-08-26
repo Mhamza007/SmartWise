@@ -14,18 +14,15 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.stackbuffers.groceryclient.R
-import com.stackbuffers.groceryclient.activities.orders.ManualOrderActivity
 import com.stackbuffers.groceryclient.activities.orders.MyOrdersActivity
 import com.stackbuffers.groceryclient.activities.signup.SignUpActivity
 import com.stackbuffers.groceryclient.fragments.HomeFragment
-import com.stackbuffers.groceryclient.fragments.OffersFragment
-import com.stackbuffers.groceryclient.model.Product
+import com.stackbuffers.groceryclient.fragments.PromotionsFragment
 import com.stackbuffers.groceryclient.utils.GlideApp
 import com.stackbuffers.groceryclient.utils.SharedPreference
 import com.stackbuffers.groceryclient.utils.Utils
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.drawer_header.*
-import kotlinx.android.synthetic.main.item_user.*
 import kotlinx.android.synthetic.main.nav_drawer_menu.*
 
 class MainActivity : AppCompatActivity() {
@@ -35,6 +32,28 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var auth: FirebaseAuth
     private val usersRef = FirebaseDatabase.getInstance().getReference("/users")
+
+    override fun onResume() {
+        super.onResume()
+
+        if (auth.currentUser != null) {
+            loginSignupMenu.visibility = View.GONE
+            usersRef.child(sharedPreference.getUserId()!!)
+                .addListenerForSingleValueEvent(object : ValueEventListener {
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        userName.text = snapshot.child("Name").value.toString()
+                        userPts.text = snapshot.child("Points").value.toString()
+                        GlideApp.with(this@MainActivity)
+                            .load(snapshot.child("profileImageUrl").value)
+                            .placeholder(R.drawable.profile_image).into(userImage)
+                    }
+
+                    override fun onCancelled(error: DatabaseError) {
+                        Utils.dbErToast(this@MainActivity)
+                    }
+                })
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,25 +76,7 @@ class MainActivity : AppCompatActivity() {
         fragmentTransaction.addToBackStack(null)
         fragmentTransaction.commit()
 
-        if (auth.currentUser != null) {
-            usersRef.child(sharedPreference.getUserId()!!)
-                .addListenerForSingleValueEvent(object : ValueEventListener {
-                    override fun onDataChange(snapshot: DataSnapshot) {
-                        userName.text = snapshot.child("Name").value.toString()
-                        userPts.text = snapshot.child("Points").value.toString()
-                        GlideApp.with(this@MainActivity)
-                            .load(snapshot.child("profileImageUrl").value)
-                            .placeholder(R.drawable.profile_image).into(userImage)
-                    }
-
-                    override fun onCancelled(error: DatabaseError) {
-                        Utils.dbErToast(this@MainActivity)
-                    }
-                })
-        }
-
         search.setOnClickListener {
-            startActivity(Intent(this@MainActivity, ManualOrderActivity::class.java))
         }
 
         notifications.setOnClickListener {
@@ -98,10 +99,6 @@ class MainActivity : AppCompatActivity() {
 
         points.setOnClickListener {
             startActivity(Intent(this@MainActivity, PointsActivity::class.java))
-        }
-
-        if (auth.currentUser != null) {
-            loginSignupMenu.visibility = View.GONE
         }
 
         loginSignupMenu.setOnClickListener {
@@ -202,7 +199,7 @@ class MainActivity : AppCompatActivity() {
                 .commit()
         } else {
             supportFragmentManager.beginTransaction()
-                .add(R.id.frame_container, OffersFragment(), OFFERS).commit()
+                .add(R.id.frame_container, PromotionsFragment(), OFFERS).commit()
         }
     }
 
@@ -244,10 +241,10 @@ class MainActivity : AppCompatActivity() {
     companion object {
         private const val TAG = "MainActivity"
 
-        private const val HOME = "HOME"
-        private const val OFFERS = "OFFERS"
-        private const val CART = "CART"
-        private const val ME = "ME"
+        const val HOME = "HOME"
+        const val OFFERS = "OFFERS"
+        const val CART = "CART"
+        const val ME = "ME"
 
     }
 }

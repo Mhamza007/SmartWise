@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Smart Wise</string>
     <string name="logo_bg">logo_bg</string>
-    <string name="offers">Offers</string>
+    <string name="offers">Promotions</string>
     <string name="home">Home</string>
     <string name="cart">My Cart</string>
     <string name="menu">Menu</string>
@@ -115,7 +115,7 @@
     <string name="how_earn">How You Can Earn Points</string>
     <string name="each">Each $100.00 Spent for your order will earn 2 Points.</string>
     <string name="how_spend">How You Can Spend Points</string>
-    <string name="each_point">Each 1 Point can be redeemed for $10.00</string>
+    <string name="each_point">Each 1 Point can be redeemed for $</string>
     <string name="our_policies">Our Policies</string>
     <string name="policy">A transaction will expire after 2 days since</string>
     <string name="gold">Gold</string>
@@ -150,4 +150,6 @@
     <string name="place_order">Place Order</string>
     <string name="image_order">Image Order</string>
     <string name="silver">Silver</string>
+    <string name="plat">Platinum</string>
+    <string name="banned">Your Account has been BANNED</string>
 </resources>

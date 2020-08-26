@@ -233,19 +233,24 @@ class ItemDetailsActivity : AppCompatActivity() {
                             1
                         )
                     ).addOnCompleteListener {
-                        Toast.makeText(
-                            this@ItemDetailsActivity,
-                            "${product.Product_Name} Added to cart",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                        addToCartBtn.visibility = View.GONE
-                        itemInCartBtn.visibility = View.VISIBLE
+                        if (it.isSuccessful) {
+                            Utils.toast(
+                                this@ItemDetailsActivity,
+                                "${product.Product_Name} Added to cart"
+                            )
+                            addToCartBtn.visibility = View.GONE
+                            itemInCartBtn.visibility = View.VISIBLE
+                        } else {
+                            Utils.toast(
+                                this@ItemDetailsActivity,
+                                "Can't add product to cart, Try Again"
+                            )
+                        }
                     }.addOnFailureListener {
-                        Toast.makeText(
+                        Utils.toast(
                             this@ItemDetailsActivity,
-                            "Can't add product to cart, Try Again",
-                            Toast.LENGTH_SHORT
-                        ).show()
+                            "Can't add product to cart, Try Again"
+                        )
                     }
             }
     }

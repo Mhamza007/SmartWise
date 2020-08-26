@@ -10,14 +10,17 @@
     app:layout_constraintStart_toStartOf="parent"
     app:layout_constraintTop_toBottomOf="@+id/promotion">
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_height="match_parent">
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:id="@+id/item_header"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
             <androidx.cardview.widget.CardView
                 android:layout_width="wrap_content"
@@ -44,10 +47,11 @@
                 android:layout_width="@dimen/_15sdp"
                 android:layout_height="@dimen/_15sdp"
                 android:layout_margin="@dimen/_2sdp"
+                android:contentDescription="@string/favorite"
                 android:src="@drawable/favorite"
-                app:tint="@color/colorBg"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                app:tint="@color/colorBg" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -60,7 +64,7 @@
             android:src="@drawable/tea_beverages"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toBottomOf="@+id/item_header" />
 
         <TextView
             android:id="@+id/name"
@@ -70,7 +74,9 @@
             android:layout_marginTop="@dimen/_5sdp"
             android:fontFamily="@font/roboto_bold"
             android:text="@string/carrot"
-            android:textSize="@dimen/_8sdp" />
+            android:textSize="@dimen/_8sdp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/image" />
 
         <TextView
             android:id="@+id/oldPrice"
@@ -81,7 +87,18 @@
             android:fontFamily="@font/roboto_bold"
             android:text="Rs.200.00"
             android:textColor="@android:color/black"
-            android:textSize="@dimen/_7sdp" />
+            android:textSize="@dimen/_7sdp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/name" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="@dimen/_1sdp"
+            android:background="@color/colorRed"
+            app:layout_constraintBottom_toBottomOf="@+id/oldPrice"
+            app:layout_constraintEnd_toEndOf="@+id/oldPrice"
+            app:layout_constraintStart_toStartOf="@+id/oldPrice"
+            app:layout_constraintTop_toTopOf="@+id/oldPrice" />
 
         <!-- tv.setPaintFlags(tv.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);-->
 
@@ -95,8 +112,11 @@
             android:fontFamily="@font/roboto_bold"
             android:text="Rs.150.00"
             android:textColor="@android:color/black"
-            android:textSize="@dimen/_7sdp" />
+            android:textSize="@dimen/_7sdp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/oldPrice" />
 
-    </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.cardview.widget.CardView>

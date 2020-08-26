@@ -61,8 +61,8 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/_5sdp"
                 android:background="@color/colorPrimary"
-                app:layout_constraintTop_toTopOf="parent"
-                android:contentDescription="@string/map_image" />
+                android:contentDescription="@string/map_image"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <androidx.cardview.widget.CardView
                 android:id="@+id/contact_us_card"
@@ -96,6 +96,7 @@
                 android:textColor="@android:color/black"
                 android:textSize="@dimen/_12sdp"
                 app:drawableStartCompat="@drawable/ic_contact_location"
+                app:drawableTint="@color/colorPrimary"
                 app:layout_constraintTop_toBottomOf="@+id/contact_us_card" />
 
             <TextView
@@ -111,6 +112,7 @@
                 android:textColor="@android:color/black"
                 android:textSize="@dimen/_12sdp"
                 app:drawableStartCompat="@drawable/ic_contact_location"
+                app:drawableTint="@color/colorPrimary"
                 app:layout_constraintTop_toBottomOf="@+id/contactAddress" />
 
             <TextView
@@ -126,6 +128,7 @@
                 android:textColor="@android:color/black"
                 android:textSize="@dimen/_12sdp"
                 app:drawableStartCompat="@drawable/ic_contact_email"
+                app:drawableTint="@color/colorPrimary"
                 app:layout_constraintTop_toBottomOf="@+id/contactNumber" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>

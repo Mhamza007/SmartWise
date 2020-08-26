@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".fragments.OffersFragment">
+    tools:context=".fragments.PromotionsFragment">
 
     <androidx.cardview.widget.CardView
         android:id="@+id/offers_card"
@@ -12,15 +12,16 @@
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/_5sdp"
         app:cardCornerRadius="@dimen/_10sdp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:cardElevation="@dimen/_5sdp"
         app:layout_constraintTop_toTopOf="parent">
 
-        <ImageView
+        <ss.com.bannerslider.Slider
+            android:id="@+id/offersSlider"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:scaleType="centerCrop"
-            android:src="@drawable/offers_image" />
+            android:layout_height="@dimen/_150sdp"
+            app:slider_animateIndicators="true"
+            app:slider_interval="5000"
+            app:slider_loopSlides="true" />
 
     </androidx.cardview.widget.CardView>
 

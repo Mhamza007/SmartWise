@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    app:cardCornerRadius="@dimen/_5sdp"
-    android:layout_margin="@dimen/_10sdp"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:layout_margin="@dimen/_10sdp"
+    app:cardCornerRadius="@dimen/_5sdp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -17,6 +17,7 @@
             android:contentDescription="@string/close"
             android:padding="@dimen/_10sdp"
             android:src="@drawable/close"
+            app:tint="@color/colorPrimary"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -25,11 +26,11 @@
             android:layout_width="@dimen/_60sdp"
             android:layout_height="@dimen/_60sdp"
             android:layout_margin="@dimen/_5sdp"
+            android:contentDescription="@string/product_image"
             android:src="@drawable/tea_beverages"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:contentDescription="@string/product_image" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/name"

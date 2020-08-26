@@ -16,4 +16,18 @@ class SharedPreference(private val context: Context) {
             context.getSharedPreferences("SharedPreference", Context.MODE_PRIVATE)
         return sharedPreferences.getString("userId", "")
     }
+
+    fun setCouponDiscount(discount: Float) {
+        val sharedPreferences =
+            context.getSharedPreferences("SharedPreference", Context.MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+        editor.putFloat("discount", discount)
+        editor.apply()
+    }
+
+    fun getCouponDiscount(): Float {
+        val sharedPreferences =
+            context.getSharedPreferences("SharedPreference", Context.MODE_PRIVATE)
+        return sharedPreferences.getFloat("discount", 0F)
+    }
 }

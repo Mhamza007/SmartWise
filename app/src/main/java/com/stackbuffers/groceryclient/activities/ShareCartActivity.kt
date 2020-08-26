@@ -27,11 +27,16 @@ class ShareCartActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_share_cart)
 
+        back.setOnClickListener {
+            finish()
+        }
+
         usersRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val adapter = GroupAdapter<GroupieViewHolder>()
                 snapshot.children.forEach {
-                    adapter.add(UserItem(this@ShareCartActivity, it))
+                    if (it.hasChild("User_ID"))
+                        adapter.add(UserItem(this@ShareCartActivity, it))
                 }
                 usersList.layoutManager = LinearLayoutManager(this@ShareCartActivity)
                 usersList.adapter = adapter
@@ -80,5 +85,6 @@ class UserItem(private val context: Context, private val dataSnapshot: DataSnaps
                 })
         }
     }
+
     override fun getLayout() = R.layout.item_user
 }

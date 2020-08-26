@@ -113,6 +113,7 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="2"
                             android:fontFamily="@font/roboto_bold"
+                            android:gravity="center"
                             android:text="@string/dummy_date"
                             android:textColor="@android:color/black"
                             android:textSize="@dimen/_13sdp" />

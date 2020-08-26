@@ -1,8 +1,9 @@
-package com.stackbuffers.groceryclient.activities
+package com.stackbuffers.groceryclient.activities.orders
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -71,7 +72,28 @@ class OrderDetailsActivity : AppCompatActivity() {
                             val formatter = SimpleDateFormat("dd-MM-yyyy")
                             date.text = formatter.format(calendar.time)
                             status.text = snapshot.child("status").value.toString()
-
+                            if (snapshot.child("status").value.toString()
+                                    .equals("pending", ignoreCase = false)
+                            ) {
+                                cancelOrder.visibility = View.VISIBLE
+                                cancelOrder.setOnClickListener {
+                                    ordersRef.child(orderId!!).removeValue()
+                                        .addOnCompleteListener { cancel ->
+                                            if (cancel.isSuccessful) {
+                                                Utils.toast(
+                                                    this@OrderDetailsActivity,
+                                                    "Order Cancelled"
+                                                )
+                                            } else {
+                                                Utils.toast(this@OrderDetailsActivity, "Error")
+                                            }
+                                        }.addOnFailureListener {
+                                            Utils.toast(this@OrderDetailsActivity, "Error")
+                                        }
+                                }
+                            } else {
+                                cancelOrder.visibility = View.GONE
+                            }
                         }
 
                         override fun onCancelled(error: DatabaseError) {

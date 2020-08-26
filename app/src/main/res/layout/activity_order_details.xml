@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activities.OrderDetailsActivity">
+    tools:context=".activities.orders.OrderDetailsActivity">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
@@ -438,6 +438,7 @@
             </androidx.cardview.widget.CardView>
 
             <Button
+                android:id="@+id/cancelOrder"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/_10sdp"
@@ -448,6 +449,7 @@
                 android:textAllCaps="false"
                 android:textColor="@android:color/white"
                 android:textSize="@dimen/_18sdp"
+                android:visibility="gone"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/payment_card" />
 

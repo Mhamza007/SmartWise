@@ -2,6 +2,7 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/homeFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".fragments.HomeFragment">
@@ -44,6 +45,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/_150sdp"
                     app:slider_animateIndicators="true"
+                    app:slider_emptyView="@layout/banner_placeholder"
                     app:slider_interval="5000"
                     app:slider_loopSlides="true" />
 
@@ -67,7 +69,7 @@
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
-                    android:id="@+id/recommendedViewAll"
+                    android:id="@+id/promotionViewAll"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/roboto_bold"
@@ -83,7 +85,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/_10sdp"
-                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/promotion">
 
             </androidx.recyclerview.widget.RecyclerView>
@@ -105,7 +106,7 @@
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
-                    android:id="@+id/catViewAll"
+                    android:id="@+id/allCatViewAll"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/roboto_bold"

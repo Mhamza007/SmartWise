@@ -3,6 +3,7 @@ package com.stackbuffers.groceryclient.activities
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -11,6 +12,7 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.stackbuffers.groceryclient.R
+import com.stackbuffers.groceryclient.activities.orders.ManualOrderActivity
 import com.stackbuffers.groceryclient.model.Product
 import com.stackbuffers.groceryclient.utils.GlideApp
 import com.stackbuffers.groceryclient.utils.ItemDecoration
@@ -21,6 +23,7 @@ import com.xwray.groupie.GroupieViewHolder
 import com.xwray.groupie.Item
 import kotlinx.android.synthetic.main.activity_cart.*
 import kotlinx.android.synthetic.main.item_cart.view.*
+import kotlinx.android.synthetic.main.item_user.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
@@ -30,6 +33,7 @@ class CartActivity : AppCompatActivity() {
     private lateinit var cartItemAdapter: GroupAdapter<GroupieViewHolder>
     private lateinit var productsList: ArrayList<Product>
     var finalPrice: Double = 0.0
+    var couponApplied = false
 
     private lateinit var userName: String
     private lateinit var userAddress: String
@@ -40,8 +44,6 @@ class CartActivity : AppCompatActivity() {
     val cartRef = FirebaseDatabase.getInstance().getReference("/Cart")
     val productsRef = FirebaseDatabase.getInstance().getReference("/Products")
 
-    private lateinit var snaap: DataSnapshot
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_cart)
@@ -49,8 +51,14 @@ class CartActivity : AppCompatActivity() {
         sharedPreference = SharedPreference(this)
         productsList = ArrayList()
 
+        couponApplied = sharedPreference.getCouponDiscount() > 0F
+
         back.setOnClickListener {
             finish()
+        }
+
+        manualOrder.setOnClickListener {
+            startActivity(Intent(this@CartActivity, ManualOrderActivity::class.java))
         }
 
         usersRef.child(sharedPreference.getUserId()!!)
@@ -105,7 +113,14 @@ class CartActivity : AppCompatActivity() {
                                     finalPrice += discountedPrice.toDouble()
 
                                     subTotal.text = finalPrice.toString()
-                                    checkoutPrice.text = finalPrice.toString()
+                                    if (couponApplied) {
+                                        val num = finalPrice.toFloat()
+                                        val value =
+                                            num - (num * (sharedPreference.getCouponDiscount() / 10))
+                                        checkoutPrice.text = value.toString()
+                                    } else {
+                                        checkoutPrice.text = finalPrice.toString()
+                                    }
 
                                     cartItemAdapter.add(
                                         CartItem(
@@ -200,7 +215,14 @@ class CartActivity : AppCompatActivity() {
                             finalPrice += disPrice.toDouble()
 
                             subTotal.text = finalPrice.toString()
-                            checkoutPrice.text = finalPrice.toString()
+                            if (couponApplied) {
+                                val num = finalPrice.toFloat()
+                                val value =
+                                    num - (num * (sharedPreference.getCouponDiscount() / 10))
+                                checkoutPrice.text = value.toString()
+                            } else {
+                                checkoutPrice.text = finalPrice.toString()
+                            }
                         } else
                             Utils.toast(context, "Error")
                     }.addOnFailureListener {
@@ -226,7 +248,16 @@ class CartActivity : AppCompatActivity() {
                                 finalPrice -= disPrice.toDouble()
 
                                 subTotal.text = finalPrice.toString()
-                                checkoutPrice.text = finalPrice.toString()
+                                Log.d(TAG, "Coupon applied : $couponApplied")
+                                Log.d(TAG, "Coupon applied : ${sharedPreference.getCouponDiscount()}")
+                                if (couponApplied) {
+                                    val num = finalPrice.toFloat()
+                                    val value =
+                                        num - (num * (sharedPreference.getCouponDiscount() / 10))
+                                    checkoutPrice.text = value.toString()
+                                } else {
+                                    checkoutPrice.text = finalPrice.toString()
+                                }
                             } else
                                 Utils.toast(context, "Error")
                         }.addOnFailureListener {
@@ -246,7 +277,14 @@ class CartActivity : AppCompatActivity() {
                             reloadList()
 
                             subTotal.text = finalPrice.toString()
-                            checkoutPrice.text = finalPrice.toString()
+                            if (couponApplied) {
+                                val num = finalPrice.toFloat()
+                                val value =
+                                    num - (num * (sharedPreference.getCouponDiscount() / 10))
+                                checkoutPrice.text = value.toString()
+                            } else {
+                                checkoutPrice.text = finalPrice.toString()
+                            }
                         }
                     }.addOnFailureListener {
                         Utils.toast(context, "Error")
@@ -257,6 +295,15 @@ class CartActivity : AppCompatActivity() {
                 val orderId = ordersRef.push().key!!
                 val date = System.currentTimeMillis().toString()
                 val map = HashMap<String, Any>()
+                val totalCheckoutPrice : String
+                totalCheckoutPrice = if (couponApplied) {
+                    val num = finalPrice.toFloat()
+                    val value =
+                        num - (num * (sharedPreference.getCouponDiscount() / 10))
+                    value.toString()
+                } else {
+                    finalPrice.toString()
+                }
                 cartRef.child(sharedPreference.getUserId()!!)
                     .addListenerForSingleValueEvent(object : ValueEventListener {
                         override fun onDataChange(cartSnapshot: DataSnapshot) {
@@ -272,7 +319,7 @@ class CartActivity : AppCompatActivity() {
                                             map["orderId"] = orderId
                                             map["date"] = date
                                             map["status"] = "Pending"
-                                            map["totalPrice"] = finalPrice
+                                            map["totalPrice"] = totalCheckoutPrice
 
                                             map["userId"] = sharedPreference.getUserId()!!
                                             map["userName"] = userName
@@ -288,17 +335,61 @@ class CartActivity : AppCompatActivity() {
                                                     if (task.isSuccessful) {
                                                         cartRef.child(sharedPreference.getUserId()!!)
                                                             .removeValue()
-                                                        Utils.toast(
-                                                            this@CartActivity,
-                                                            "Order Placed"
-                                                        )
-//                                                        val intent = Intent(
-//                                                            context,
-//                                                            OrderDetailsActivity::class.java
-//                                                        )
-//                                                        intent.putExtra("order_id", orderId)
-//                                                        context.startActivity(intent)
-                                                        finish()
+                                                        usersRef.child(sharedPreference.getUserId()!!)
+                                                            .addListenerForSingleValueEvent(object :
+                                                                ValueEventListener {
+                                                                override fun onDataChange(snapshot: DataSnapshot) {
+                                                                    if (snapshot.hasChild("orderCount")) {
+                                                                        val orderCount =
+                                                                            snapshot.child("orderCount").value.toString()
+                                                                                .toInt()
+                                                                        val oc = orderCount + 1
+                                                                        usersRef.child(
+                                                                            sharedPreference.getUserId()!!
+                                                                        )
+                                                                            .child("orderCount")
+                                                                            .setValue(oc)
+                                                                            .addOnCompleteListener {
+                                                                                if (it.isSuccessful) {
+                                                                                    Utils.toast(
+                                                                                        this@CartActivity,
+                                                                                        "Order Placed"
+                                                                                    )
+                                                                                    finish()
+                                                                                } else
+                                                                                    Utils.toast(
+                                                                                        context,
+                                                                                        "Failed to order"
+                                                                                    )
+                                                                            }
+                                                                    } else {
+                                                                        usersRef.child(
+                                                                            sharedPreference.getUserId()!!
+                                                                        )
+                                                                            .child("orderCount")
+                                                                            .setValue(1)
+                                                                            .addOnCompleteListener {
+                                                                                if (it.isSuccessful) {
+                                                                                    Utils.toast(
+                                                                                        this@CartActivity,
+                                                                                        "Order Placed"
+                                                                                    )
+                                                                                    finish()
+                                                                                } else {
+                                                                                    Utils.toast(
+                                                                                        context,
+                                                                                        "Failed to order"
+                                                                                    )
+                                                                                }
+                                                                            }
+                                                                    }
+
+                                                                }
+
+                                                                override fun onCancelled(error: DatabaseError) {
+                                                                    Utils.dbErToast(context)
+                                                                }
+                                                            })
                                                     } else {
                                                         Utils.toast(
                                                             this@CartActivity,
