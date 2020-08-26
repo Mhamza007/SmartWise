@@ -195,7 +195,7 @@
             android:drawablePadding="@dimen/_15sdp"
             android:fontFamily="@font/roboto_bold"
             android:gravity="center"
-            android:text="@string/exit"
+            android:text="@string/logout"
             android:textColor="@android:color/white"
             android:textSize="@dimen/_15sdp"
             app:drawableStartCompat="@drawable/ic_exit"

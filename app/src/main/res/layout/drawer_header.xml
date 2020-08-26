@@ -92,9 +92,10 @@
                 app:layout_constraintTop_toTopOf="parent">
 
                 <ImageView
+                    android:id="@+id/coin"
                     android:layout_width="@dimen/_30sdp"
                     android:layout_height="@dimen/_30sdp"
-                    android:background="@drawable/gold_coin"
+                    android:src="@drawable/silver_coin"
                     android:contentDescription="@string/coin"
                     android:gravity="center"
                     app:layout_constraintBottom_toBottomOf="parent"

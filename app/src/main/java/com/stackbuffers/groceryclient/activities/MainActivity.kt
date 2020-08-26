@@ -13,8 +13,11 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import com.google.firebase.iid.FirebaseInstanceId
+import com.google.firebase.messaging.FirebaseMessaging
 import com.stackbuffers.groceryclient.R
 import com.stackbuffers.groceryclient.activities.orders.MyOrdersActivity
+import com.stackbuffers.groceryclient.activities.signin.SignInActivity
 import com.stackbuffers.groceryclient.activities.signup.SignUpActivity
 import com.stackbuffers.groceryclient.fragments.HomeFragment
 import com.stackbuffers.groceryclient.fragments.PromotionsFragment
@@ -32,9 +35,16 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var auth: FirebaseAuth
     private val usersRef = FirebaseDatabase.getInstance().getReference("/users")
+    private val financeRef = FirebaseDatabase.getInstance().getReference("/Finance")
 
     override fun onResume() {
         super.onResume()
+
+        if (auth.currentUser == null) {
+            exitMenu.visibility = View.GONE
+        } else {
+            exitMenu.visibility = View.VISIBLE
+        }
 
         if (auth.currentUser != null) {
             loginSignupMenu.visibility = View.GONE
@@ -42,10 +52,57 @@ class MainActivity : AppCompatActivity() {
                 .addListenerForSingleValueEvent(object : ValueEventListener {
                     override fun onDataChange(snapshot: DataSnapshot) {
                         userName.text = snapshot.child("Name").value.toString()
-                        userPts.text = snapshot.child("Points").value.toString()
                         GlideApp.with(this@MainActivity)
                             .load(snapshot.child("profileImageUrl").value)
                             .placeholder(R.drawable.profile_image).into(userImage)
+                        if (snapshot.hasChild("Points"))
+                            userPts.text = snapshot.child("Points").value.toString()
+                        else
+                            userPts.text = "0"
+                        if (snapshot.hasChild("orderCount")) {
+                            val orderCount = snapshot.child("orderCount").value.toString().toInt()
+                            financeRef.addListenerForSingleValueEvent(object : ValueEventListener {
+                                override fun onDataChange(snapshot: DataSnapshot) {
+                                    if (snapshot.exists()) {
+
+                                        val silverStart =
+                                            snapshot.child("SilverStart").value.toString().toInt()
+                                        val silverEnd =
+                                            snapshot.child("SilverEnd").value.toString().toInt()
+                                        val goldStart =
+                                            snapshot.child("GoldStart").value.toString().toInt()
+                                        val goldEnd =
+                                            snapshot.child("GoldEnd").value.toString().toInt()
+                                        val platStart =
+                                            snapshot.child("PlatinumStart").value.toString().toInt()
+                                        val platEnd =
+                                            snapshot.child("PlatinumEnd").value.toString().toInt()
+
+                                        when (orderCount) {
+                                            in silverStart until silverEnd -> {
+                                                GlideApp.with(this@MainActivity)
+                                                    .load(R.drawable.silver_coin).into(coin)
+                                                userPoints.text = getString(R.string.silver)
+                                            }
+                                            in goldStart until goldEnd -> {
+                                                GlideApp.with(this@MainActivity)
+                                                    .load(R.drawable.gold_coin).into(coin)
+                                                userPoints.text = getString(R.string.gold)
+                                            }
+                                            in platStart until platEnd -> {
+                                                GlideApp.with(this@MainActivity)
+                                                    .load(R.drawable.plat_coin).into(coin)
+                                                userPoints.text = getString(R.string.plat)
+                                            }
+                                        }
+                                    }
+                                }
+
+                                override fun onCancelled(error: DatabaseError) {
+                                    Utils.dbErToast(this@MainActivity)
+                                }
+                            })
+                        }
                     }
 
                     override fun onCancelled(error: DatabaseError) {
@@ -58,6 +115,19 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        FirebaseInstanceId.getInstance().instanceId.addOnSuccessListener { instanceIdResult ->
+            val newToken = instanceIdResult.token
+            FirebaseMessaging.getInstance().subscribeToTopic("Notifications").addOnCompleteListener {
+                if (it.isSuccessful) {
+                    Log.d(TAG, "Subscribed for notifications")
+                } else {
+                    Log.e(TAG, "Unable to Subscribe for notifications")
+                }
+            }.addOnFailureListener {
+                Log.e(TAG, "Unable to Subscribe for notifications ${it.message}")
+            }
+        }
 
         auth = FirebaseAuth.getInstance()
         sharedPreference = SharedPreference(this@MainActivity)
@@ -106,7 +176,10 @@ class MainActivity : AppCompatActivity() {
         }
 
         myProfileMenu.setOnClickListener {
-            startActivity(Intent(this@MainActivity, MyProfileActivity::class.java))
+            if (auth.currentUser != null)
+                startActivity(Intent(this@MainActivity, MyProfileActivity::class.java))
+            else
+                startActivity(Intent(this@MainActivity, SignUpActivity::class.java))
         }
 
         myCartMenu.setOnClickListener {
@@ -142,7 +215,12 @@ class MainActivity : AppCompatActivity() {
         }
 
         exitMenu.setOnClickListener {
-            finish()
+            auth.signOut().also {
+                val intent = Intent(this@MainActivity, SignInActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
+                startActivity(intent)
+                finish()
+            }
         }
     }
 
@@ -245,6 +323,5 @@ class MainActivity : AppCompatActivity() {
         const val OFFERS = "OFFERS"
         const val CART = "CART"
         const val ME = "ME"
-
     }
 }

@@ -152,4 +152,6 @@
     <string name="silver">Silver</string>
     <string name="plat">Platinum</string>
     <string name="banned">Your Account has been BANNED</string>
+    <string name="default_notification_channel_id">SmartWise</string>
+    <string name="logout">Log Out</string>
 </resources>

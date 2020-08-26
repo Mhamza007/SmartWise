@@ -5,6 +5,7 @@
     android:id="@+id/drawerLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/colorBg"
     tools:context=".activities.MainActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -54,6 +55,7 @@
                     android:layout_marginEnd="@dimen/_10sdp"
                     android:contentDescription="@string/search"
                     android:src="@drawable/search"
+                    android:visibility="gone"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@+id/notifications"
                     app:layout_constraintTop_toTopOf="parent" />

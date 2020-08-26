@@ -5,11 +5,14 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.android.volley.toolbox.JsonObjectRequest
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import com.stackbuffers.groceryclient.MyApp
 import com.stackbuffers.groceryclient.R
+import com.stackbuffers.groceryclient.model.MySingleton
 import com.stackbuffers.groceryclient.model.Product
 import com.stackbuffers.groceryclient.utils.GlideApp
 import com.stackbuffers.groceryclient.utils.SharedPreference
@@ -19,6 +22,8 @@ import com.xwray.groupie.GroupieViewHolder
 import com.xwray.groupie.Item
 import kotlinx.android.synthetic.main.activity_return_items.*
 import kotlinx.android.synthetic.main.item_completed_order_product.view.*
+import org.json.JSONException
+import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.HashMap
@@ -27,6 +32,7 @@ class ReturnItemsActivity : AppCompatActivity() {
 
     private lateinit var sharedPreference: SharedPreference
     private val ordersRef = FirebaseDatabase.getInstance().getReference("/Orders")
+    private val usersRef = FirebaseDatabase.getInstance().getReference("/users")
     private val returnRef = FirebaseDatabase.getInstance().getReference("/Return")
     private val returningRef = FirebaseDatabase.getInstance().getReference("/Returning")
     private var orderId: String? = null
@@ -149,6 +155,7 @@ class ReturnItemsActivity : AppCompatActivity() {
                     viewHolder.itemView.item_quantity.text = returnQuantity.toString()
                 }
             }
+            val credentialRef = FirebaseDatabase.getInstance().getReference("/Credential")
 
             returnItems.setOnClickListener {
                 returningRef.child(orderId!!)
@@ -164,6 +171,77 @@ class ReturnItemsActivity : AppCompatActivity() {
                                             .addOnCompleteListener {
                                                 if (it.isSuccessful) {
                                                     Utils.toast(context, "Return Requested")
+                                                    credentialRef.addListenerForSingleValueEvent(
+                                                        object : ValueEventListener {
+                                                            override fun onDataChange(
+                                                                snapshot: DataSnapshot
+                                                            ) {
+                                                                val topic =
+                                                                    snapshot.child("Token").value.toString()
+                                                                usersRef.child(sharedPreference.getUserId()!!)
+                                                                    .addListenerForSingleValueEvent(
+                                                                        object :
+                                                                            ValueEventListener {
+                                                                            override fun onDataChange(
+                                                                                snapshot: DataSnapshot
+                                                                            ) {
+                                                                                val userName =
+                                                                                    snapshot.child("Name").value.toString()
+                                                                                val notificationTitle =
+                                                                                    "${sharedPreference.getUserId()}/$userName"
+                                                                                val notificationMessage =
+                                                                                    "Ordered"
+
+                                                                                val notification =
+                                                                                    JSONObject()
+                                                                                val notificationBody =
+                                                                                    JSONObject()
+
+                                                                                try {
+                                                                                    notificationBody.put(
+                                                                                        "title",
+                                                                                        notificationTitle
+                                                                                    )
+                                                                                    notificationBody.put(
+                                                                                        "message",
+                                                                                        notificationMessage
+                                                                                    )
+
+                                                                                    notification.put(
+                                                                                        "to",
+                                                                                        topic
+                                                                                    )
+                                                                                    notification.put(
+                                                                                        "data",
+                                                                                        notificationBody
+                                                                                    )
+                                                                                } catch (e: JSONException) {
+                                                                                    e.printStackTrace()
+                                                                                }
+                                                                                sendNotification(
+                                                                                    notification
+                                                                                )
+                                                                            }
+
+                                                                            override fun onCancelled(
+                                                                                error: DatabaseError
+                                                                            ) {
+                                                                                Utils.dbErToast(
+                                                                                    context
+                                                                                )
+                                                                            }
+
+                                                                        }
+                                                                    )
+                                                            }
+
+                                                            override fun onCancelled(
+                                                                error: DatabaseError
+                                                            ) {
+                                                                Utils.dbErToast(context)
+                                                            }
+
+                                                        })
                                                     finish()
                                                 } else {
                                                     Utils.toast(context, "Failed to Request Return")
@@ -220,6 +298,24 @@ class ReturnItemsActivity : AppCompatActivity() {
                 }
             })
             return updated
+        }
+
+        private fun sendNotification(notification: JSONObject) {
+            val jsonObjectRequest = object : JsonObjectRequest(
+                MyApp.FCM_API, notification,
+                { response -> Log.i(ShareCartActivity.TAG, "onResponse: $response") },
+                { error ->
+                    Utils.toast(context, "Notifications Request error")
+                    Log.e(ShareCartActivity.TAG, "Notifications Request error $error")
+                }) {
+                override fun getHeaders(): MutableMap<String, String> {
+                    val params = HashMap<String, String>()
+                    params["Authorization"] = MyApp.SERVER_KEY
+                    params["Content-Type"] = MyApp.CONTENT_TYPE
+                    return params
+                }
+            }
+            MySingleton.getInstance(context.applicationContext)?.addToRequestQueue(jsonObjectRequest)
         }
     }
 }

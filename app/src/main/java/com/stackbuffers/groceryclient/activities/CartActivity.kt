@@ -7,12 +7,15 @@ import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.android.volley.toolbox.JsonObjectRequest
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import com.stackbuffers.groceryclient.MyApp
 import com.stackbuffers.groceryclient.R
 import com.stackbuffers.groceryclient.activities.orders.ManualOrderActivity
+import com.stackbuffers.groceryclient.model.MySingleton
 import com.stackbuffers.groceryclient.model.Product
 import com.stackbuffers.groceryclient.utils.GlideApp
 import com.stackbuffers.groceryclient.utils.ItemDecoration
@@ -24,6 +27,8 @@ import com.xwray.groupie.Item
 import kotlinx.android.synthetic.main.activity_cart.*
 import kotlinx.android.synthetic.main.item_cart.view.*
 import kotlinx.android.synthetic.main.item_user.*
+import org.json.JSONException
+import org.json.JSONObject
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
@@ -170,6 +175,7 @@ class CartActivity : AppCompatActivity() {
     ) :
         Item<GroupieViewHolder>() {
 
+        private val credentialRef = FirebaseDatabase.getInstance().getReference("/Credential")
         private val rs = context.getString(R.string.rs)
         private val productPrice = snapshot.child("Product_Price").value.toString()
         private val discountedPrice = snapshot.child("Discount_Price").value.toString()
@@ -343,6 +349,7 @@ class CartActivity : AppCompatActivity() {
                                                                         val orderCount =
                                                                             snapshot.child("orderCount").value.toString()
                                                                                 .toInt()
+                                                                        val username = snapshot.child("Name").value.toString()
                                                                         val oc = orderCount + 1
                                                                         usersRef.child(
                                                                             sharedPreference.getUserId()!!
@@ -355,6 +362,41 @@ class CartActivity : AppCompatActivity() {
                                                                                         this@CartActivity,
                                                                                         "Order Placed"
                                                                                     )
+
+                                                                                    credentialRef.addListenerForSingleValueEvent(object : ValueEventListener {
+                                                                                        override fun onDataChange(
+                                                                                            snapshot: DataSnapshot
+                                                                                        ) {
+                                                                                            val topic = snapshot.child("Token").value.toString()
+                                                                                            val notificationTitle = "${sharedPreference.getUserId()}/$userName"
+                                                                                            val notificationMessage = "Ordered"
+
+                                                                                            val notification = JSONObject()
+                                                                                            val notificationBody = JSONObject()
+
+                                                                                            try {
+                                                                                                notificationBody.put("title", notificationTitle)
+                                                                                                notificationBody.put(
+                                                                                                    "message",
+                                                                                                    notificationMessage
+                                                                                                )
+
+                                                                                                notification.put("to", topic)
+                                                                                                notification.put("data", notificationBody)
+                                                                                            } catch (e: JSONException) {
+                                                                                                e.printStackTrace()
+                                                                                            }
+                                                                                            sendNotification(notification)
+                                                                                        }
+
+                                                                                        override fun onCancelled(
+                                                                                            error: DatabaseError
+                                                                                        ) {
+                                                                                            Utils.dbErToast(context)
+                                                                                        }
+
+                                                                                    })
+
                                                                                     finish()
                                                                                 } else
                                                                                     Utils.toast(
@@ -374,6 +416,39 @@ class CartActivity : AppCompatActivity() {
                                                                                         this@CartActivity,
                                                                                         "Order Placed"
                                                                                     )
+                                                                                    credentialRef.addListenerForSingleValueEvent(object : ValueEventListener {
+                                                                                        override fun onDataChange(
+                                                                                            snapshot: DataSnapshot
+                                                                                        ) {
+                                                                                            val topic = snapshot.child("Token").value.toString()
+                                                                                            val notificationTitle = "${sharedPreference.getUserId()}/$userName"
+                                                                                            val notificationMessage = "Ordered"
+
+                                                                                            val notification = JSONObject()
+                                                                                            val notificationBody = JSONObject()
+
+                                                                                            try {
+                                                                                                notificationBody.put("title", notificationTitle)
+                                                                                                notificationBody.put(
+                                                                                                    "message",
+                                                                                                    notificationMessage
+                                                                                                )
+
+                                                                                                notification.put("to", topic)
+                                                                                                notification.put("data", notificationBody)
+                                                                                            } catch (e: JSONException) {
+                                                                                                e.printStackTrace()
+                                                                                            }
+                                                                                            sendNotification(notification)
+                                                                                        }
+
+                                                                                        override fun onCancelled(
+                                                                                            error: DatabaseError
+                                                                                        ) {
+                                                                                            Utils.dbErToast(context)
+                                                                                        }
+
+                                                                                    })
                                                                                     finish()
                                                                                 } else {
                                                                                     Utils.toast(
@@ -416,6 +491,24 @@ class CartActivity : AppCompatActivity() {
                         }
                     })
             }
+        }
+
+        private fun sendNotification(notification: JSONObject) {
+            val jsonObjectRequest = object : JsonObjectRequest(
+                MyApp.FCM_API, notification,
+                { response -> Log.i(ShareCartActivity.TAG, "onResponse: $response") },
+                { error ->
+                    Utils.toast(context, "Notifications Request error")
+                    Log.e(ShareCartActivity.TAG, "Notifications Request error $error")
+                }) {
+                override fun getHeaders(): MutableMap<String, String> {
+                    val params = HashMap<String, String>()
+                    params["Authorization"] = MyApp.SERVER_KEY
+                    params["Content-Type"] = MyApp.CONTENT_TYPE
+                    return params
+                }
+            }
+            MySingleton.getInstance(context.applicationContext)?.addToRequestQueue(jsonObjectRequest)
         }
     }
 

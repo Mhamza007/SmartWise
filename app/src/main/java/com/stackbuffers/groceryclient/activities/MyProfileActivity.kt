@@ -49,26 +49,6 @@ class MyProfileActivity : AppCompatActivity() {
 
         sharedPreference = SharedPreference(this)
 
-        name_layout.setOnClickListener {
-            val intent = Intent(this@MyProfileActivity, EditActivity::class.java)
-            intent.putExtra("field", "Name")
-            startActivity(intent)
-        }
-
-        address_layout.setOnClickListener {
-            val intent = Intent(this@MyProfileActivity, EditActivity::class.java)
-            intent.putExtra("field", "Address")
-            startActivity(intent)
-        }
-
-        profileImage.setOnClickListener {
-            changeProfileImage()
-        }
-
-        camera.setOnClickListener {
-            changeProfileImage()
-        }
-
         usersRef.child(sharedPreference.getUserId()!!).addValueEventListener(object :
             ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
@@ -91,9 +71,8 @@ class MyProfileActivity : AppCompatActivity() {
                         .placeholder(R.drawable.profile_image).into(profileImage)
                     userName.text = username
                     userEmail.text = email
-                    userCity.text = city
                     userNumber.text = number
-                    userAddress.text = address
+                    addressText.text = address
                     points.text = pts
 
                     financeRef.addListenerForSingleValueEvent(object : ValueEventListener {
@@ -107,17 +86,17 @@ class MyProfileActivity : AppCompatActivity() {
                             when (orderCount) {
                                 in silverStart..silverEnd -> {
                                     GlideApp.with(this@MyProfileActivity)
-                                        .load(R.drawable.silver_coin).into(silverCoin)
+                                        .load(R.drawable.silver_coin).into(coin)
                                     userCate.text = getString(R.string.silver)
                                 }
                                 in goldStart..goldEnd -> {
                                     GlideApp.with(this@MyProfileActivity)
-                                        .load(R.drawable.gold_coin).into(silverCoin)
+                                        .load(R.drawable.gold_coin).into(coin)
                                     userCate.text = getString(R.string.gold)
                                 }
                                 in platStart..platEnd -> {
                                     GlideApp.with(this@MyProfileActivity)
-                                        .load(R.drawable.plat_coin).into(silverCoin)
+                                        .load(R.drawable.plat_coin).into(coin)
                                     userCate.text = getString(R.string.plat)
                                 }
                             }
@@ -140,8 +119,22 @@ class MyProfileActivity : AppCompatActivity() {
             finish()
         }
 
-        coin_card.setOnClickListener {
+        profileImage.setOnClickListener {
+            changeProfileImage()
+        }
+
+        pointsCard.setOnClickListener {
             startActivity(Intent(this@MyProfileActivity, PointsActivity::class.java))
+        }
+
+        couponsCard.setOnClickListener {
+            startActivity(Intent(this@MyProfileActivity, CouponsActivity::class.java))
+        }
+
+        addressCard.setOnClickListener {
+            val intent = Intent(this@MyProfileActivity, EditActivity::class.java)
+            intent.putExtra("field", "Address")
+            startActivity(intent)
         }
     }
 

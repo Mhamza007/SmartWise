@@ -7,6 +7,8 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.iid.FirebaseInstanceId
+import com.stackbuffers.groceryclient.MyApp
 import com.stackbuffers.groceryclient.R
 import com.stackbuffers.groceryclient.activities.signin.SignInActivity
 import com.stackbuffers.groceryclient.utils.SharedPreference
@@ -69,29 +71,50 @@ class SignUpActivity : AppCompatActivity() {
                 if (it.isSuccessful) {
                     currentUserId = auth.currentUser!!.uid
 
-                    val db = FirebaseDatabase.getInstance().getReference("/users")
+                    FirebaseInstanceId.getInstance().instanceId
+                        .addOnCompleteListener { task ->
+                            if (!task.isSuccessful) {
+                                Log.w(TAG, "getInstanceId failed", task.exception)
+                            }
+                            val token = "${task.result?.token}"
+                            val db = FirebaseDatabase.getInstance().getReference("/users")
 
-                    val map = HashMap<String, Any>()
-                    map["Ban"] = ""
-                    map["City"] = city
-                    map["Email"] = email
-                    map["Mobile_Number"] = ""
-                    map["Name"] = name
-                    map["Reason"] = ""
-                    map["User_ID"] = currentUserId
-                    map["profileImageUrl"] = ""
+                            val map = HashMap<String, Any>()
+                            map["Ban"] = ""
+                            map["City"] = city
+                            map["Email"] = email
+                            map["Mobile_Number"] = ""
+                            map["Name"] = name
+                            map["Reason"] = ""
+                            map["User_ID"] = currentUserId
+                            map["profileImageUrl"] = ""
+                            map["token"] = token
 
-                    db.child(currentUserId).setValue(map).addOnCompleteListener { task ->
-                        if (task.isSuccessful) {
-                            sharedPreference.setUserId(currentUserId)
-                            startActivity(Intent(this, AddPhoneNumberActivity::class.java))
-                            finish()
-                        } else {
-                            Toast.makeText(this, "Sign up Failed", Toast.LENGTH_SHORT).show()
+                            db.child(currentUserId).setValue(map)
+                                .addOnCompleteListener { task1 ->
+                                    if (task1.isSuccessful) {
+                                        sharedPreference.setUserId(currentUserId)
+                                        startActivity(
+                                            Intent(
+                                                this,
+                                                AddPhoneNumberActivity::class.java
+                                            )
+                                        )
+                                        finish()
+                                    } else {
+                                        Toast.makeText(
+                                            this,
+                                            "Sign up Failed",
+                                            Toast.LENGTH_SHORT
+                                        )
+                                            .show()
+                                    }
+                                }.addOnFailureListener {
+                                    Toast.makeText(this, "Sign up Failed", Toast.LENGTH_SHORT)
+                                        .show()
+                                }
+
                         }
-                    }.addOnFailureListener {
-                        Toast.makeText(this, "Sign up Failed", Toast.LENGTH_SHORT).show()
-                    }
                 } else {
                     Toast.makeText(this, "Sign up Failed", Toast.LENGTH_SHORT).show()
                 }
